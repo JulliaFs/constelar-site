@@ -1,0 +1,101 @@
+/* ============================================================
+   DESIGN TOKENS — extracted from the Claude Design reference
+   (Nossa Constelacao.dc.html). Change values here to re-theme
+   the whole site; components should never hardcode a color.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url('../assets/fonts/cormorant-garamond/cormorant-garamond-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url('../assets/fonts/cormorant-garamond/cormorant-garamond-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url('../assets/fonts/jost/jost-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('../assets/fonts/jetbrains-mono/jetbrains-mono-normal.woff2') format('woff2');
+}
+
+:root {
+  /* --- color: night sky --- */
+  --cor-noite-900: #070B1A;
+  --cor-noite-800: #0B1026;
+  --cor-noite-700: #0E1330;
+  --cor-noite-600: #161C42;
+  --cor-veludo: #1B2A6B;
+
+  /* --- color: gold --- */
+  --cor-ouro-700: #8A6B1F;
+  --cor-ouro-600: #C9A227;
+  --cor-ouro-500: #D4AF37;
+  --cor-ouro-300: #F0C869;
+
+  /* --- color: ink & accents --- */
+  --cor-pergaminho: #F5EFE0;
+  --cor-pergaminho-60: rgba(245, 239, 224, .62);
+  --cor-pergaminho-50: rgba(245, 239, 224, .5);
+  --cor-pergaminho-30: rgba(245, 239, 224, .32);
+  --cor-pergaminho-22: rgba(245, 239, 224, .22);
+  --cor-estelar: #EAF2FF;
+  --cor-cobre: #CE8A5C;
+
+  /* --- typography --- */
+  --fonte-exib: 'Cormorant Garamond', Georgia, serif;
+  --fonte-texto: 'Jost', -apple-system, sans-serif;
+  --fonte-nota: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* --- spacing (base 4) --- */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 16px;
+  --esp-4: 24px;
+  --esp-5: 40px;
+  --esp-6: 64px;
+  --esp-7: 96px;
+  --esp-8: 144px;
+
+  --moldura: 28px;
+  --faixa-segura: 120px;
+  --coluna-texto: 640px;
+  --raio: 0px;
+
+  /* --- glow / shadow --- */
+  --brilho-p: 0 0 12px rgba(240, 200, 105, .22);
+  --brilho-m: 0 0 26px rgba(240, 200, 105, .32);
+  --brilho-g: 0 0 64px rgba(240, 200, 105, .26);
+  --brilho-estrela: 0 0 8px rgba(234, 242, 255, .85);
+  --sombra-abobada: 0 40px 90px -30px rgba(0, 0, 0, .85), inset 0 0 90px rgba(7, 11, 26, .9);
+  --sombra-selo: 0 18px 34px -12px rgba(0, 0, 0, .7), inset 0 2px 0 rgba(255, 235, 180, .45), inset 0 -8px 18px rgba(90, 62, 10, .55);
+  --linha-fina: 1px solid rgba(201, 162, 39, .28);
+  --linha-viva: 1px solid #C9A227;
+
+  /* --- motion --- */
+  --mov-suave: cubic-bezier(.22, .61, .36, 1);
+  --mov-entrada: cubic-bezier(.16, 1, .3, 1);
+  --mov-selo: cubic-bezier(.34, 1.56, .64, 1);
+  --dur-instante: 120ms;
+  --dur-rapido: 240ms;
+  --dur-padrao: 420ms;
+  --dur-cena: 900ms;
+  --dur-ritual: 1600ms;
+}

@@ -1,0 +1,87 @@
+/* ============================================================
+   TRANSITIONS
+   ============================================================ */
+
+/* ---- page-turn: chapter complete -> back to hub ----
+   Applied to .pagina__conteudo only, so the corner ornaments
+   on the outer .pagina shell stay static during the flip. */
+
+.pagina__dobra {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, .55), transparent 45%);
+}
+
+.pagina.is-virando .pagina__dobra {
+  animation: dobraFlash var(--dur-cena) linear forwards;
+}
+
+.pagina__conteudo.is-saindo {
+  animation: paginaViraSaida var(--dur-cena) var(--mov-suave) forwards;
+  transform-origin: left center;
+}
+
+.pagina__conteudo.is-entrando {
+  animation: paginaViraEntrada var(--dur-cena) var(--mov-suave) forwards;
+  transform-origin: right center;
+}
+
+@keyframes paginaViraSaida {
+  0%   { transform: rotateY(0deg); opacity: 1; }
+  100% { transform: rotateY(-100deg); opacity: 0; }
+}
+
+@keyframes paginaViraEntrada {
+  0%   { transform: rotateY(100deg); opacity: 0; }
+  100% { transform: rotateY(0deg); opacity: 1; }
+}
+
+@keyframes dobraFlash {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: .5; }
+}
+
+/* ---- star-zoom: hub -> chapter entry ---- */
+
+.pagina.is-zoom-saida {
+  animation: mapaZoomSaida 560ms var(--mov-suave) forwards;
+  transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
+}
+
+@keyframes mapaZoomSaida {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(7); opacity: 0; }
+}
+
+.pagina__conteudo.is-zoom-entrada {
+  animation: capituloZoomEntrada 520ms var(--mov-entrada) forwards;
+}
+
+@keyframes capituloZoomEntrada {
+  from { opacity: 0; transform: scale(1.18); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---- constellation: new star lighting up (played on hub arrival) ---- */
+
+.constelacao__linha.is-acendendo {
+  stroke-dasharray: var(--comprimento, 60);
+  stroke-dashoffset: var(--comprimento, 60);
+  animation: linhaDesenha var(--dur-cena) var(--mov-suave) forwards;
+}
+
+@keyframes linhaDesenha {
+  to { stroke-dashoffset: 0; }
+}
+
+.constelacao__no.is-acendendo {
+  animation: noAcende 700ms var(--mov-suave) forwards;
+}
+
+@keyframes noAcende {
+  from { r: 2; fill-opacity: .22; }
+  to   { r: 3.4; fill-opacity: 1; }
+}

@@ -1,0 +1,651 @@
+/* ============================================================
+   BASE / RESET
+   ============================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--cor-noite-900);
+  color: var(--cor-pergaminho);
+  font-family: var(--fonte-texto);
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+::selection {
+  background: rgba(240, 200, 105, .3);
+  color: var(--cor-pergaminho);
+}
+
+a { color: var(--cor-ouro-300); }
+
+#tsparticles-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  perspective: 2400px;
+}
+
+/* ============================================================
+   GLYPHS — pure CSS, no image assets
+   ============================================================ */
+
+.fagulha {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--cor-ouro-300);
+  clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
+  flex-shrink: 0;
+}
+
+.fagulha--estelar {
+  background: var(--cor-estelar);
+}
+
+.crescente {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: inset -9px 2px 0 0 var(--cor-ouro-500), 0 0 18px rgba(240, 200, 105, .35);
+}
+
+/* ============================================================
+   PAGE SHELL — the "page" container reused by every screen
+   ============================================================ */
+
+.pagina {
+  position: relative;
+  width: min(1200px, 92vw);
+  aspect-ratio: 1200 / 740;
+  max-height: 88vh;
+  background: var(--cor-noite-800);
+  border: 1px solid rgba(201, 162, 39, .24);
+  box-shadow: var(--sombra-abobada);
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.pagina__ceu {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(closest-side at var(--ceu-x, 50%) var(--ceu-y, 46%),
+      var(--cor-noite-700) 0%, var(--cor-noite-800) 58%, var(--cor-noite-900) 100%);
+  z-index: 0;
+}
+
+.pagina__nebulosa {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 30% 70%, var(--cor-veludo) 0%, transparent 70%);
+  opacity: var(--nebulosa-opacidade, 0);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.pagina__estrelas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.4px 1.4px at 10% 20%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1px 1px at 30% 65%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1.6px 1.6px at 55% 15%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1px 1px at 72% 80%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1.2px 1.2px at 85% 35%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1px 1px at 95% 60%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1.3px 1.3px at 20% 90%, var(--cor-estelar) 0, transparent 100%),
+    radial-gradient(1px 1px at 45% 45%, var(--cor-estelar) 0, transparent 100%);
+  opacity: .55;
+}
+
+.pagina__moldura {
+  position: absolute;
+  inset: var(--moldura);
+  border: 1px solid rgba(201, 162, 39, .1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pagina__conteudo {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-4);
+  padding: var(--esp-7) var(--faixa-segura);
+  text-align: center;
+  backface-visibility: hidden;
+}
+
+/* ---- corner ornaments (pinned to the outer shell, never rotate) ---- */
+
+.pagina__canto {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  z-index: 3;
+  pointer-events: none;
+}
+.pagina__canto::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 46px; height: 1px;
+  background: linear-gradient(90deg, rgba(201,162,39,.6), transparent);
+}
+.pagina__canto::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 1px; height: 34px;
+  background: linear-gradient(180deg, rgba(201,162,39,.6), transparent);
+}
+.pagina__canto span {
+  position: absolute;
+  top: 12px; left: 12px;
+  width: 6px; height: 6px;
+  border: 1px solid var(--cor-ouro-600);
+  transform: rotate(45deg);
+}
+
+.pagina__canto--tl { top: var(--moldura); left: var(--moldura); }
+.pagina__canto--tr { top: var(--moldura); right: var(--moldura); transform: scaleX(-1); }
+.pagina__canto--bl { bottom: var(--moldura); left: var(--moldura); transform: scaleY(-1); }
+.pagina__canto--br { bottom: var(--moldura); right: var(--moldura); transform: scale(-1, -1); }
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+
+.txt-rotulo {
+  font-family: var(--fonte-texto);
+  font-weight: 500;
+  font-size: .72rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--cor-pergaminho-50);
+}
+
+.txt-capitulo {
+  font-family: var(--fonte-exib);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  color: var(--cor-pergaminho);
+}
+
+.txt-enigma {
+  font-family: var(--fonte-exib);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  line-height: 1.5;
+  color: var(--cor-pergaminho);
+  max-width: var(--coluna-texto);
+}
+
+.txt-corpo {
+  font-family: var(--fonte-texto);
+  font-weight: 300;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--cor-pergaminho-60);
+  max-width: 58ch;
+}
+.txt-corpo p + p { margin-top: 1rem; }
+
+.txt-nota {
+  font-family: var(--fonte-nota);
+  font-size: .68rem;
+  letter-spacing: .14em;
+  color: var(--cor-pergaminho-50);
+}
+
+/* ============================================================
+   CTA BUTTON
+   ============================================================ */
+
+.btn-cta {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(201, 162, 39, .4);
+  background: rgba(22, 28, 66, .38);
+  color: var(--cor-ouro-300);
+  cursor: pointer;
+  padding: 16px 34px;
+  border-radius: var(--raio);
+  font-family: var(--fonte-texto);
+  font-weight: 500;
+  font-size: .78rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  transition: box-shadow var(--dur-padrao) var(--mov-suave),
+              border-color var(--dur-padrao) var(--mov-suave),
+              background var(--dur-padrao) var(--mov-suave);
+}
+
+.btn-cta:hover {
+  box-shadow: 0 0 30px rgba(240, 200, 105, .3), inset 0 0 24px rgba(240, 200, 105, .08);
+  border-color: var(--cor-ouro-300);
+}
+
+.btn-cta:active { transform: translateY(1px); }
+
+.btn-cta:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ============================================================
+   ENIGMA INPUT FIELD
+   ============================================================ */
+
+.enigma-campo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(560px, 100%);
+  margin-top: var(--esp-3);
+}
+
+.enigma-campo__linha {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+.enigma-campo__ponta {
+  width: 6px; height: 6px;
+  background: var(--cor-ouro-600);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  opacity: .7;
+}
+
+.enigma-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
+  font-family: var(--fonte-exib);
+  font-weight: 500;
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--cor-pergaminho);
+  caret-color: var(--cor-ouro-300);
+  min-width: 0;
+  transition: color var(--dur-padrao) var(--mov-suave), text-shadow var(--dur-padrao) var(--mov-suave);
+}
+
+.enigma-regua {
+  width: 100%;
+  height: 1px;
+  margin-top: 10px;
+  background: rgba(201, 162, 39, .42);
+  transition: background var(--dur-padrao) var(--mov-suave), box-shadow var(--dur-padrao) var(--mov-suave);
+}
+
+.enigma-campo.is-correto .enigma-input {
+  color: var(--cor-ouro-300);
+  text-shadow: 0 0 18px rgba(240, 200, 105, .5);
+}
+.enigma-campo.is-correto .enigma-regua {
+  background: var(--cor-ouro-600);
+  box-shadow: var(--brilho-m);
+}
+.enigma-campo.is-erro .enigma-regua {
+  background: var(--cor-cobre);
+}
+.enigma-campo.is-erro .enigma-campo__linha {
+  animation: tremorSuave 520ms var(--mov-suave);
+}
+
+.enigma-status {
+  position: relative;
+  width: 100%;
+  min-height: 24px;
+  margin-top: 14px;
+}
+
+.enigma-status__msg {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  font-family: var(--fonte-texto);
+  font-size: .85rem;
+  opacity: 0;
+  transition: opacity var(--dur-padrao) var(--mov-entrada);
+}
+.enigma-status__msg.visivel { opacity: 1; }
+.enigma-status__msg--hint { color: var(--cor-pergaminho-50); }
+.enigma-status__msg--erro { color: var(--cor-cobre); }
+.enigma-status__msg--ok { color: var(--cor-ouro-300); }
+
+/* coordinate / hint lines */
+.enigma-pistas {
+  font-family: var(--fonte-nota);
+  font-size: .82rem;
+  line-height: 1.9;
+  color: var(--cor-pergaminho-60);
+  border: 1px dashed rgba(201, 162, 39, .3);
+  padding: 14px 20px;
+  letter-spacing: .02em;
+}
+
+/* ============================================================
+   WAX SEAL — enigma reveal / unlock gesture
+   ============================================================ */
+
+.selo-wrap {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selo-wrap.is-quebrado { cursor: default; pointer-events: none; }
+
+.selo-halo {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 200, 105, .22) 0%, transparent 70%);
+  transition: opacity var(--dur-cena) var(--mov-suave);
+}
+.selo-wrap.is-quebrado .selo-halo { opacity: 0; }
+
+.selo-corpo {
+  position: absolute;
+  width: 112px;
+  height: 112px;
+  border-radius: 47% 53% 46% 54% / 52% 46% 54% 48%;
+  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 38%, #A8801F 72%, #7A5C15 100%);
+  box-shadow: var(--sombra-selo);
+  animation: seloRespira 5200ms ease-in-out infinite;
+}
+
+.selo-corpo::before {
+  content: '';
+  position: absolute;
+  inset: 15px;
+  border-radius: 50%;
+  border: 1px solid rgba(90, 62, 10, .4);
+  box-shadow: inset 0 1px 0 rgba(255, 235, 180, .25);
+}
+
+.selo-corpo::after {
+  content: '';
+  position: absolute;
+  top: 40px; left: 38px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  box-shadow: inset -8px 1px 0 0 rgba(86, 58, 10, .65);
+}
+
+.selo-metade--esq {
+  clip-path: polygon(0 0, 52% 0, 47% 18%, 54% 38%, 46% 60%, 53% 80%, 49% 100%, 0 100%);
+}
+.selo-metade--dir {
+  clip-path: polygon(52% 0, 100% 0, 100% 100%, 49% 100%, 53% 80%, 46% 60%, 54% 38%, 47% 18%);
+}
+
+.selo-wrap.is-entrando .selo-corpo {
+  animation: seloCarimbo 900ms var(--mov-selo) both;
+}
+
+.selo-wrap.is-quebrado .selo-metade--esq {
+  animation: seloEsquerda 900ms cubic-bezier(.3, .9, .4, 1) forwards;
+}
+.selo-wrap.is-quebrado .selo-metade--dir {
+  animation: seloDireita 900ms cubic-bezier(.3, .9, .4, 1) forwards;
+}
+
+.selo-caco {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 12px; height: 12px;
+  background: linear-gradient(140deg, #F0C869, #8A6B1F);
+  opacity: 0;
+  pointer-events: none;
+}
+.selo-wrap.is-quebrado .selo-caco { opacity: 1; }
+.selo-wrap.is-quebrado .selo-caco:nth-child(1) { animation: cacoA 760ms var(--mov-suave) forwards; }
+.selo-wrap.is-quebrado .selo-caco:nth-child(2) { animation: cacoB 820ms var(--mov-suave) 40ms forwards; }
+.selo-wrap.is-quebrado .selo-caco:nth-child(3) { animation: cacoC 880ms var(--mov-suave) 80ms forwards; }
+.selo-wrap.is-quebrado .selo-caco:nth-child(4) { animation: cacoA 940ms var(--mov-suave) 120ms forwards reverse; }
+.selo-wrap.is-quebrado .selo-caco:nth-child(5) { animation: cacoB 1000ms var(--mov-suave) 160ms forwards reverse; }
+.selo-wrap.is-quebrado .selo-caco:nth-child(6) { animation: cacoC 1060ms var(--mov-suave) 200ms forwards reverse; }
+
+.selo-legenda {
+  margin-top: var(--esp-3);
+  opacity: .42;
+  transition: opacity var(--dur-padrao) var(--mov-suave);
+}
+.selo-wrap.is-quebrado + .selo-legenda { opacity: 0; }
+
+.selo-revelacao {
+  opacity: 0;
+  max-width: var(--coluna-texto);
+  transition: opacity var(--dur-cena) var(--mov-entrada);
+}
+.selo-revelacao.visivel { opacity: 1; }
+
+.selo-revelacao [data-linha] {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.selo-revelacao.visivel [data-linha] {
+  animation: subeEntra 800ms var(--mov-entrada) forwards;
+}
+
+/* ============================================================
+   CONSTELLATION (progress map) — small breadcrumb + large hub
+   ============================================================ */
+
+.constelacao {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.constelacao--small {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  opacity: .85;
+}
+
+.constelacao__no {
+  fill: var(--cor-pergaminho-22);
+}
+.constelacao__no--completo {
+  fill: var(--cor-ouro-300);
+  filter: drop-shadow(0 0 10px rgba(240, 200, 105, .9));
+}
+.constelacao__no--atual {
+  fill: var(--cor-ouro-300);
+  cursor: pointer;
+}
+.constelacao__no--bloqueado {
+  fill: var(--cor-pergaminho-22);
+}
+
+.constelacao__anel {
+  fill: none;
+  stroke: var(--cor-ouro-300);
+  stroke-opacity: .5;
+  stroke-width: 1;
+  animation: anelPulso 2600ms ease-out infinite;
+  pointer-events: none;
+}
+
+.constelacao__linha {
+  stroke: var(--cor-pergaminho);
+  stroke-opacity: .12;
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+.constelacao__linha--acesa {
+  stroke: var(--cor-ouro-600);
+  stroke-opacity: .75;
+  stroke-dasharray: none;
+}
+
+.constelacao__label {
+  fill: var(--cor-pergaminho-50);
+  font-family: var(--fonte-nota);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.constelacao__hit {
+  fill: transparent;
+  cursor: pointer;
+}
+.constelacao__hit--bloqueado {
+  cursor: default;
+}
+
+.constelacao__contador {
+  font-family: var(--fonte-nota);
+  font-size: .68rem;
+  letter-spacing: .14em;
+  color: var(--cor-pergaminho-30);
+}
+
+/* ============================================================
+   COLLECTIBLE BAR
+   ============================================================ */
+
+.colecionaveis {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.colecionaveis__item {
+  width: 11px;
+  height: 11px;
+  opacity: 0;
+  transform: scale(.3);
+  animation: colecionavelEntra 700ms var(--mov-selo) forwards;
+}
+
+/* ============================================================
+   FALLBACK for missing media (placeholder assets during dev)
+   ============================================================ */
+
+.midia-fallback {
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(201, 162, 39, .35);
+  background: rgba(201, 162, 39, .04);
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+@keyframes tremorSuave {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+@keyframes subeEntra {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes seloRespira {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.022); }
+}
+
+@keyframes seloCarimbo {
+  0%   { transform: scale(.4) rotate(-12deg); opacity: 0; filter: blur(8px); }
+  55%  { transform: scale(1.12) rotate(3deg); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes seloEsquerda {
+  to { transform: translate(-104px, 30px) rotate(-17deg); opacity: 0; }
+}
+@keyframes seloDireita {
+  to { transform: translate(104px, 26px) rotate(15deg); opacity: 0; }
+}
+
+@keyframes cacoA { to { transform: translate(-70px, -96px) rotate(180deg); opacity: 0; } }
+@keyframes cacoB { to { transform: translate(88px, -74px) rotate(-150deg); opacity: 0; } }
+@keyframes cacoC { to { transform: translate(-24px, -130px) rotate(96deg); opacity: 0; } }
+
+@keyframes anelPulso {
+  0%   { transform: scale(.7); opacity: .85; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes colecionavelEntra {
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 640px) {
+  .pagina { aspect-ratio: auto; min-height: 92vh; }
+  .pagina__conteudo { padding: var(--esp-5) var(--esp-4); }
+  .pagina__canto { width: 40px; height: 40px; }
+  .constelacao--small { bottom: 14px; }
+  .colecionaveis { top: 14px; right: 14px; }
+}
