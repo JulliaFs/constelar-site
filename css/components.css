@@ -66,12 +66,22 @@ a { color: var(--cor-ouro-300); }
   background: var(--cor-estelar);
 }
 
-.crescente {
+/* Main emblem — recolored via mask so the source SVG (a black silhouette)
+   renders in the site's gold, with a soft glow behind it. */
+.emblema-principal {
   display: inline-block;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  box-shadow: inset -9px 2px 0 0 var(--cor-ouro-500), 0 0 18px rgba(240, 200, 105, .35);
+  width: 132px;
+  height: 132px;
+  background: var(--cor-ouro-500);
+  -webkit-mask-image: url('../assets/brand/emblema.svg');
+  mask-image: url('../assets/brand/emblema.svg');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  filter: drop-shadow(0 0 22px rgba(240, 200, 105, .35));
 }
 
 /* ============================================================

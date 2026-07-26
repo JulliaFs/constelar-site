@@ -18,7 +18,7 @@ export function renderCover(appRoot, book, { onOpen }) {
   livro.innerHTML = `
     <div class="capa-livro__lombada"></div>
     <div class="capa-livro__moldura"></div>
-    <div class="crescente"></div>
+    <div class="emblema-principal" role="presentation"></div>
     <div class="capa-livro__titulo">${book.bookTitle}</div>
     <span class="txt-rotulo">${book.openBookLabel || 'Abrir o grimório'}</span>
   `;
