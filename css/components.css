@@ -580,6 +580,45 @@ a { color: var(--cor-ouro-300); }
 }
 
 /* ============================================================
+   BACK-TO-START SHORTCUT (temporary dev/testing convenience)
+   ============================================================ */
+
+.botao-inicio {
+  position: fixed;
+  top: 24px;
+  left: 28px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--cor-pergaminho-50);
+  font-family: var(--fonte-texto);
+  font-weight: 500;
+  font-size: .68rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .55;
+  transition: opacity var(--dur-padrao) var(--mov-suave), color var(--dur-padrao) var(--mov-suave);
+}
+
+.botao-inicio:hover {
+  opacity: 1;
+  color: var(--cor-ouro-300);
+}
+
+.botao-inicio__seta {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-left: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* ============================================================
    FALLBACK for missing media (placeholder assets during dev)
    ============================================================ */
 

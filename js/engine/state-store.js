@@ -67,3 +67,12 @@ export function saveState(patch) {
   writeRaw(next);
   return next;
 }
+
+/** Wipes all saved progress (used by the "back to start" dev shortcut). */
+export function clearState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore storage failures */
+  }
+}

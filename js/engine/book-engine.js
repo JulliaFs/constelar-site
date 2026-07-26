@@ -1,5 +1,5 @@
 import { book, chapters, comingSoon } from '../../config/story.config.js';
-import { getState, saveState } from './state-store.js';
+import { getState, saveState, clearState } from './state-store.js';
 import { loadChapterModule, nextChapterId } from './chapter-loader.js';
 import { renderCover } from './renderers/cover.js';
 import { renderHub } from './renderers/hub.js';
@@ -26,10 +26,12 @@ export class BookEngine {
     this.currentOuterEl = null;
     this.collectibleBarEl = null;
     this.miniConstellationEl = null;
+    this.homeButtonEl = null;
   }
 
   async init() {
     this._ensureCollectibleBar();
+    this._ensureHomeButton();
     const state = getState(CHAPTER_IDS[0] ?? null);
     this._syncCollectibleBar(state);
 
@@ -77,6 +79,27 @@ export class BookEngine {
   _hideMiniConstellation() {
     this.miniConstellationEl?.remove();
     this.miniConstellationEl = null;
+  }
+
+  // ---- back-to-start shortcut (TEMPORARY dev/testing convenience) ----
+
+  _ensureHomeButton() {
+    if (this.homeButtonEl) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'botao-inicio';
+    btn.innerHTML = '<span class="botao-inicio__seta"></span><span>Início</span>';
+    btn.addEventListener('click', () => this._resetToStart());
+    document.body.appendChild(btn);
+    this.homeButtonEl = btn;
+  }
+
+  _resetToStart() {
+    clearState();
+    this._hideMiniConstellation();
+    this.currentOuterEl?.remove();
+    this.currentOuterEl = null;
+    this.init();
   }
 
   // ---- cover ----
