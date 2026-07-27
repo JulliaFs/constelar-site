@@ -6,22 +6,18 @@
 
 export const book = {
   bookTitle: 'Nossa Constelação',
-  openBookLabel: 'Abrir o grimório',
-  coverHint: 'Clique no livro para começar',
+  startLabel: 'Começar',
 };
 
 // Only { id, load() } here — the hub/constellation must render using
 // just ids, never a chapter's title/content, so a locked chapter's
 // module (and its images) is never fetched before the reader reaches it.
 export const chapters = [
-  { id: 'example-1', load: () => import('./chapters/example-1-narrative.js') },
-  { id: 'example-2', load: () => import('./chapters/example-2-enigma.js') },
-  { id: 'example-3', load: () => import('./chapters/example-3-gallery.js') },
-  { id: 'example-4', load: () => import('./chapters/example-4-narrative.js') },
-  // config/chapters/chapter-1.js holds the REAL, already-tested chapter 1
-  // content (Teixeira de Freitas riddle) — swap it back in for real content
-  // once the new engine is validated with the placeholders above. See
-  // README.md for the exact field mapping.
+  { id: 'ch1-primeira-luz', load: () => import('./chapters/ch1-primeira-luz.js') },
+  { id: 'ch2-enigma-viajante', load: () => import('./chapters/ch2-enigma-viajante.js') },
+  { id: 'ch3-alinhamento-celestial', load: () => import('./chapters/ch3-alinhamento-celestial.js') },
+  { id: 'ch4-runas-esquecidas', load: () => import('./chapters/ch4-runas-esquecidas.js') },
+  { id: 'ch5-melodia-estrelas', load: () => import('./chapters/ch5-melodia-estrelas.js') },
 ];
 
 // Shown once every chapter above is completed (the trailing, always-locked
@@ -34,4 +30,11 @@ export const comingSoon = {
     'Essa parte da história ainda está sendo escrita.',
     'Volte em breve para continuar.',
   ],
+};
+
+// Bespoke ending sequence played once the last chapter's carta is closed.
+export const finale = {
+  message: 'Você encontrou todas as cartas.',
+  buttonLabel: '✨ Revelar o Último Segredo',
+  teaser: ['[TEASER DO APP AQUI]'],
 };

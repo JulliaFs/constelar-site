@@ -66,6 +66,25 @@ a { color: var(--cor-ouro-300); }
   background: var(--cor-estelar);
 }
 
+.glifo-sol {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--cor-ouro-300) 35%, transparent 36%),
+    repeating-conic-gradient(from 0deg, var(--cor-ouro-300) 0deg 3deg, transparent 3deg 30deg);
+}
+
+.glifo-lua {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--cor-ouro-300);
+  box-shadow: inset 4px -2px 0 0 var(--cor-noite-800);
+}
+
 /* Main emblem — recolored via mask so the source SVG (a black silhouette)
    renders in the site's gold, with a soft glow behind it. */
 .emblema-principal {
@@ -475,6 +494,9 @@ a { color: var(--cor-ouro-300); }
 }
 .selo-wrap.is-quebrado + .selo-legenda { opacity: 0; }
 
+/* Orphaned: superseded by .carta-* below (the seal now reveals a
+   letter to open, not an inline paragraph panel). Left in place,
+   unused, rather than deleted blind. */
 .selo-revelacao {
   opacity: 0;
   max-width: var(--coluna-texto);
@@ -488,6 +510,228 @@ a { color: var(--cor-ouro-300); }
 }
 .selo-revelacao.visivel [data-linha] {
   animation: subeEntra 800ms var(--mov-entrada) forwards;
+}
+
+/* ============================================================
+   CARTA — the letter/card reveal, opened after a wax seal breaks.
+   The one place outside the cover where a warm parchment tone is
+   intentional (a letter is diegetically made of paper).
+   ============================================================ */
+
+.carta-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.carta-wrap {
+  position: relative;
+  width: 108px;
+  height: 78px;
+  cursor: pointer;
+  animation: cartaRespira 5200ms ease-in-out infinite;
+}
+
+.carta-corpo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(155deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 70%);
+  border: 1px solid var(--cor-perg-sombra);
+  box-shadow: 0 14px 30px -10px rgba(0, 0, 0, .6), 0 0 20px rgba(240, 200, 105, .12);
+}
+
+.carta-corpo::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(74, 52, 25, .25);
+}
+
+.carta-selo-mini {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 22px; height: 22px;
+  transform: translate(-50%, -50%);
+  border-radius: 47% 53% 46% 54% / 52% 46% 54% 48%;
+  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 38%, #A8801F 72%, #7A5C15 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+}
+
+.carta-legenda {
+  opacity: .55;
+}
+
+@keyframes cartaRespira {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.carta-aberta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-4);
+  opacity: 0;
+  transform: rotateX(-90deg);
+  transform-origin: top center;
+  transition: opacity var(--dur-cena) var(--mov-entrada), transform var(--dur-cena) var(--mov-selo);
+}
+.carta-aberta.visivel {
+  opacity: 1;
+  transform: rotateX(0deg);
+}
+
+.carta-aberta__pergaminho {
+  background: linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
+  border: 1px solid var(--cor-perg-sombra);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, .7);
+  color: var(--cor-perg-tinta) !important;
+  padding: var(--esp-5);
+  max-width: min(var(--coluna-texto), 90%);
+}
+.carta-aberta__pergaminho p {
+  color: var(--cor-perg-tinta);
+}
+.carta-aberta__pergaminho [data-linha] {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: subeEntra 700ms var(--mov-entrada) forwards;
+}
+
+/* ============================================================
+   PEDESTAL — riddle presentation 'pedestal' (chapter 2): a stone
+   pedestal with a parchment scroll resting on top, bearing the riddle.
+   ============================================================ */
+
+.pedestal-cena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pedestal-pergaminho {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
+  border: 1px solid var(--cor-perg-sombra);
+  box-shadow: 0 14px 30px -10px rgba(0, 0, 0, .55);
+  padding: var(--esp-4) var(--esp-5);
+  max-width: min(var(--coluna-texto), 90%);
+  margin-bottom: -18px;
+}
+
+.pedestal-pergaminho__texto {
+  font-family: var(--fonte-exib);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  line-height: 1.5;
+  color: var(--cor-perg-tinta);
+  text-align: center;
+}
+
+.pedestal-corpo {
+  width: 190px;
+  height: 120px;
+  clip-path: polygon(22% 0%, 78% 0%, 94% 100%, 6% 100%);
+  background: linear-gradient(180deg, #6b6b70 0%, #38383b 100%);
+  border-top: 4px solid #8c8c91;
+  box-shadow: 0 24px 40px -14px rgba(0, 0, 0, .65);
+}
+
+/* ============================================================
+   RUNES — riddle presentation 'runes' (chapter 4): a stone tablet
+   with the message in real Elder Futhark Unicode, plus an
+   auto-derived translation legend.
+   ============================================================ */
+
+.runas-cena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-4);
+}
+
+.runas-tablete {
+  background: linear-gradient(160deg, #4a4a4e 0%, #2a2a2d 100%);
+  border: 1px solid rgba(201, 162, 39, .3);
+  box-shadow: 0 20px 40px -14px rgba(0, 0, 0, .65), inset 0 0 30px rgba(0, 0, 0, .5);
+  padding: var(--esp-4) var(--esp-5);
+  max-width: min(var(--coluna-texto), 90%);
+}
+
+.runas-tablete__texto {
+  font-family: var(--fonte-runica);
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  letter-spacing: .08em;
+  line-height: 1.9;
+  color: var(--cor-pergaminho-60);
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .6), 0 0 12px rgba(234, 242, 255, .12);
+}
+
+.runas-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--esp-3);
+  max-width: 480px;
+}
+
+.runas-legenda__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--fonte-nota);
+  font-size: .78rem;
+  color: var(--cor-pergaminho-50);
+}
+
+.runas-legenda__rune {
+  font-family: var(--fonte-runica);
+  font-size: 1rem;
+  color: var(--cor-ouro-300);
+}
+
+.runas-legenda__seta {
+  opacity: .5;
+}
+
+/* ============================================================
+   MELODY — riddle presentation 'melody' (chapter 5): a musical
+   parchment with a lyric excerpt (blanks) and a chord line. No audio.
+   ============================================================ */
+
+.melodia-cena {
+  display: flex;
+  justify-content: center;
+}
+
+.melodia-pergaminho {
+  background: linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
+  border: 1px solid var(--cor-perg-sombra);
+  box-shadow: 0 20px 45px -16px rgba(0, 0, 0, .6);
+  padding: var(--esp-5);
+  max-width: min(var(--coluna-texto), 90%);
+  text-align: center;
+}
+
+.melodia-letra p {
+  font-family: var(--fonte-exib);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  line-height: 1.7;
+  color: var(--cor-perg-tinta);
+}
+
+.melodia-cifra {
+  margin-top: var(--esp-3);
+  font-family: var(--fonte-nota);
+  font-size: .85rem;
+  letter-spacing: .06em;
+  color: var(--cor-perg-sombra);
 }
 
 /* ============================================================
@@ -689,6 +933,61 @@ a { color: var(--cor-ouro-300); }
 
 @keyframes colecionavelEntra {
   to { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================
+   PARTICLE BURST — small gold celebration, no canvas/library.
+   Parent must be position:relative (or similar) for % coords.
+   ============================================================ */
+
+.particula-estouro {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--cor-ouro-300);
+  clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
+  transform: translate(-50%, -50%);
+  animation: particulaEstoura 900ms ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes particulaEstoura {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.3); opacity: 0; }
+}
+
+/* ---- floating musical notes — chapter 5's success payoff ---- */
+
+.nota-flutuante {
+  position: absolute;
+  bottom: 10%;
+  font-family: var(--fonte-exib);
+  font-size: 1.3rem;
+  color: var(--cor-ouro-300);
+  text-shadow: 0 0 10px rgba(240, 200, 105, .6);
+  pointer-events: none;
+  animation: notaFlutua 2200ms ease-out forwards;
+}
+
+@keyframes notaFlutua {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translateY(-160px) translateX(var(--deriva)); opacity: 0; }
+}
+
+/* ---- larger wax seal — chapter 5's more elaborate payoff ---- */
+
+.selo-wrap--grande {
+  width: 190px;
+  height: 190px;
+}
+.selo-wrap--grande .selo-halo {
+  width: 190px;
+  height: 190px;
+}
+.selo-wrap--grande .selo-corpo {
+  width: 142px;
+  height: 142px;
 }
 
 @media (max-width: 640px) {

@@ -3,15 +3,15 @@
  * affordance. Stamps in (elastic pop) after a correct answer, breathes
  * in place, and on click splits into two halves + shard fragments.
  *
- * @param {{onBreak?: () => void}} opts
+ * @param {{onBreak?: () => void, size?: 'normal'|'grande'}} opts
  * @returns {{el: HTMLElement, stampIn: () => void}}
  */
-export function buildWaxSeal({ onBreak } = {}) {
+export function buildWaxSeal({ onBreak, size = 'normal' } = {}) {
   const container = document.createElement('div');
   container.className = 'tela-enigma__selo-area';
 
   const wrap = document.createElement('div');
-  wrap.className = 'selo-wrap';
+  wrap.className = size === 'grande' ? 'selo-wrap selo-wrap--grande' : 'selo-wrap';
   wrap.setAttribute('role', 'button');
   wrap.setAttribute('tabindex', '0');
   wrap.setAttribute('aria-label', 'Quebrar o lacre');

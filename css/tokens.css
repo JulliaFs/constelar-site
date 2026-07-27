@@ -36,6 +36,15 @@
   src: url('../assets/fonts/jetbrains-mono/jetbrains-mono-normal.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Noto Sans Runic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/noto-sans-runic/noto-sans-runic-normal.woff2') format('woff2');
+  unicode-range: U+16A0-16F8;
+}
+
 :root {
   /* --- color: night sky --- */
   --cor-noite-900: #070B1A;
@@ -59,10 +68,20 @@
   --cor-estelar: #EAF2FF;
   --cor-cobre: #CE8A5C;
 
+  /* --- color: warm parchment (scoped to diegetic paper objects only —
+     the cover's scroll, the pedestal/tablet props, and the carta letter.
+     The map and chapter backgrounds stay navy — never use these for
+     page/screen backgrounds.) --- */
+  --cor-perg-creme: #E8D9B5;
+  --cor-perg-creme-alta: #F3E7C4;
+  --cor-perg-sombra: #6B4E2E;
+  --cor-perg-tinta: #4A3419;
+
   /* --- typography --- */
   --fonte-exib: 'Cormorant Garamond', Georgia, serif;
   --fonte-texto: 'Jost', -apple-system, sans-serif;
   --fonte-nota: 'JetBrains Mono', 'Courier New', monospace;
+  --fonte-runica: 'Noto Sans Runic', 'Cormorant Garamond', serif;
 
   /* --- spacing (base 4) --- */
   --esp-1: 4px;

@@ -85,3 +85,13 @@
   from { r: 2; fill-opacity: .22; }
   to   { r: 3.4; fill-opacity: 1; }
 }
+
+/* ---- finale: last chapter's carta closes -> bespoke ending ---- */
+
+.pagina.is-escurecendo {
+  animation: telaEscurece var(--dur-cena) var(--mov-suave) forwards;
+}
+
+@keyframes telaEscurece {
+  to { opacity: 0; filter: brightness(.2); }
+}

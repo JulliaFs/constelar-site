@@ -6,7 +6,7 @@
 
 export default {
   id: 'example-2',
-  type: 'enigma',
+  type: 'riddle',
   title: '[TÍTULO DO CAPÍTULO 2 · ENIGMA]',
 
   // Texto curto de contexto antes do enigma (opcional).

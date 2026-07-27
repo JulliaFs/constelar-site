@@ -1,53 +1,61 @@
-// The cover is the closed grimoire itself, not a "page" — it sits
-// directly on the starfield/particles background with no page-shell
-// frame (the frame represents an open page, the cover is the object).
+// Game-style title screen: "Começar" on a bare starfield, no page-shell
+// frame (the frame represents an open page; this is the title, not a
+// page). Clicking plays a parchment-scroll unroll before the hub appears.
 
-const OPEN_DURATION_MS = 900; // must match livroAbre in css/screens.css
+const FADE_OUT_MS = 420; // must match --dur-padrao in css/tokens.css
+const UNROLL_MS = 900; // must match pergaminhoDesenrola in css/screens.css
 
 export function renderCover(appRoot, book, { onOpen }) {
   appRoot.innerHTML = '';
 
   const wrap = document.createElement('div');
-  wrap.className = 'tela-capa';
+  wrap.className = 'tela-titulo';
 
-  const livro = document.createElement('div');
-  livro.className = 'capa-livro';
-  livro.setAttribute('role', 'button');
-  livro.setAttribute('tabindex', '0');
-  livro.setAttribute('aria-label', book.openBookLabel || 'Abrir o grimório');
-  livro.innerHTML = `
-    <div class="capa-livro__lombada"></div>
-    <div class="capa-livro__moldura"></div>
+  const titulo = document.createElement('div');
+  titulo.className = 'tela-titulo__bloco';
+  titulo.innerHTML = `
     <div class="emblema-principal" role="presentation"></div>
-    <div class="capa-livro__titulo">${book.bookTitle}</div>
-    <span class="txt-rotulo">${book.openBookLabel || 'Abrir o grimório'}</span>
+    <h1 class="tela-titulo__nome">${book.bookTitle}</h1>
+    <button type="button" class="btn-cta tela-titulo__comecar">
+      <span class="fagulha"></span><span>${book.startLabel || 'Começar'}</span>
+    </button>
   `;
 
-  const dica = document.createElement('p');
-  dica.className = 'tela-capa__dica txt-corpo';
-  dica.textContent = book.coverHint || '';
-
-  wrap.append(livro, dica);
+  wrap.appendChild(titulo);
   appRoot.appendChild(wrap);
 
   let opened = false;
   function open() {
     if (opened) return;
     opened = true;
-    livro.classList.add('is-abrindo');
+
+    titulo.classList.add('is-saindo');
     setTimeout(() => {
-      wrap.remove();
-      onOpen?.();
-    }, OPEN_DURATION_MS);
+      titulo.remove();
+      mountPergaminho(wrap);
+      setTimeout(() => {
+        wrap.remove();
+        onOpen?.();
+      }, UNROLL_MS);
+    }, FADE_OUT_MS);
   }
 
-  livro.addEventListener('click', open);
-  livro.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      open();
-    }
-  });
+  titulo.querySelector('.tela-titulo__comecar').addEventListener('click', open);
 
   return wrap;
+}
+
+function mountPergaminho(wrap) {
+  const pergaminho = document.createElement('div');
+  pergaminho.className = 'pergaminho-abertura';
+  pergaminho.innerHTML = `
+    <div class="pergaminho-superficie"></div>
+    <div class="pergaminho-rolo pergaminho-rolo--topo"></div>
+    <div class="pergaminho-rolo pergaminho-rolo--base"></div>
+  `;
+  wrap.appendChild(pergaminho);
+  // Force reflow so the animation class change is picked up as a transition, not a jump.
+  void pergaminho.offsetWidth;
+  pergaminho.classList.add('is-desenrolando');
+  return pergaminho;
 }
