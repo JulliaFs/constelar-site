@@ -735,6 +735,174 @@ a { color: var(--cor-ouro-300); }
 }
 
 /* ============================================================
+   ASTROLÁBIO DA CAPA — três anéis giratórios em latão/bronze.
+   Componente exclusivo da tela inicial (js/engine/renderers/cover.js).
+   Prefixo .astro-* para não colidir com o astrolábio do capítulo 3
+   (.astrolabio*), que é outro componente.
+   ============================================================ */
+
+.astro-palco {
+  position: relative;
+  width: min(560px, 84vw);
+  aspect-ratio: 1;
+}
+
+.astro {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .75));
+}
+
+/* ---- anéis ---- */
+
+.astro-anel {
+  transform-box: view-box;
+  transform-origin: 200px 200px;
+  transform: rotate(var(--rot, 0deg));
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.astro-anel.is-arrastando { cursor: grabbing; }
+.astro-anel.is-snapping { transition: transform 420ms var(--mov-selo); }
+.astro-anel.is-travado { cursor: default; pointer-events: none; }
+
+.astro-anel__leito {
+  filter: url(#astro-relevo);
+}
+
+.astro-anel__fio {
+  opacity: .9;
+}
+
+.astro-anel__ranhura {
+  stroke: var(--cor-ouro-600);
+  stroke-opacity: .55;
+  stroke-width: 1.1;
+}
+
+.astro-anel__numeral {
+  font-family: var(--fonte-exib);
+  font-weight: 500;
+  fill: url(#astro-latao);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  letter-spacing: .02em;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, .55);
+  stroke-width: .6;
+  user-select: none;
+}
+
+.astro-anel__pegada {
+  pointer-events: stroke;
+}
+
+/* Só a faixa de pegada recebe ponteiro — numerais e ranhuras não
+   roubam o arrasto nem viram alvo de clique acidental. */
+.astro-anel__leito,
+.astro-anel__fio,
+.astro-anel__ranhura,
+.astro-anel__numeral {
+  pointer-events: none;
+}
+
+.astro-anel.is-pulso .astro-anel__fio {
+  stroke: var(--cor-ouro-300);
+  filter: drop-shadow(0 0 6px rgba(240, 200, 105, .8));
+}
+
+.astro-anel:focus-visible .astro-anel__fio {
+  stroke: var(--cor-ouro-300);
+  filter: drop-shadow(0 0 8px rgba(240, 200, 105, .9));
+}
+
+/* ---- núcleo ---- */
+
+.astro-nucleo__disco {
+  fill: url(#astro-nucleo);
+  filter: url(#astro-relevo);
+}
+
+.astro-nucleo__aro {
+  fill: none;
+  stroke: #1A1208;
+  stroke-opacity: .55;
+  stroke-width: 1.4;
+}
+
+.astro-nucleo__estrela {
+  fill: #1A1208;
+  fill-opacity: .62;
+}
+
+.astro-nucleo__halo {
+  fill: none;
+  stroke: var(--cor-ouro-300);
+  stroke-width: 1.5;
+  opacity: 0;
+}
+
+/* ---- marcador fixo das 12h ---- */
+
+.astro-marcador {
+  pointer-events: none;
+  filter: url(#astro-brilho) drop-shadow(0 0 10px rgba(240, 200, 105, .85));
+}
+
+.astro-marcador__estrela {
+  fill: url(#astro-latao-inv);
+}
+
+.astro-marcador__nucleo {
+  fill: #F3E5AB;
+}
+
+.astro-marcador__ponteiro {
+  fill: url(#astro-latao);
+  stroke: #1A1208;
+  stroke-opacity: .4;
+  stroke-width: .8;
+}
+
+/* ---- vitória: pulso luminoso ---- */
+
+.astro-palco.is-alinhado .astro {
+  animation: astroVitoria 1500ms var(--mov-suave);
+}
+
+.astro-palco.is-alinhado .astro-nucleo__disco {
+  animation: astroNucleoPulsa 1500ms var(--mov-suave);
+}
+
+.astro-palco.is-alinhado .astro-nucleo__halo {
+  animation: astroHalo 1500ms var(--mov-suave);
+}
+
+@keyframes astroVitoria {
+  0%   { filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .75)); }
+  35%  { filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .75)) drop-shadow(0 0 46px rgba(240, 200, 105, .75)); }
+  100% { filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .75)) drop-shadow(0 0 22px rgba(240, 200, 105, .35)); }
+}
+
+@keyframes astroNucleoPulsa {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.12); }
+  55%  { transform: scale(.98); }
+  100% { transform: scale(1); }
+}
+.astro-palco.is-alinhado .astro-nucleo__disco {
+  transform-box: view-box;
+  transform-origin: 200px 200px;
+}
+
+@keyframes astroHalo {
+  0%   { opacity: .9; r: 62; stroke-width: 2.4; }
+  100% { opacity: 0; r: 168; stroke-width: .4; }
+}
+
+/* ============================================================
    CONSTELLATION (progress map) — small breadcrumb + large hub
    ============================================================ */
 

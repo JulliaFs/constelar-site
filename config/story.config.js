@@ -6,7 +6,14 @@
 
 export const book = {
   bookTitle: 'Nossa Constelação',
-  startLabel: 'Começar',
+  coverHint: 'Alinhe os astros no dia em que o seu universo começou.',
+
+  // Data-alvo do astrolábio da tela inicial, no formato "dia|mês|ano"
+  // (mês em número, 1-12). Fica ofuscada para não expor uma data pessoal
+  // em texto simples no código do lado do cliente.
+  // Para trocar: node scripts/generate-answer.mjs "27|7|2004"
+  // Limites dos anéis: dia 1-31, mês 1-12, ano 1998-2010.
+  coverTargetPayload: 'Ozc3OcKDPsKDPjk=',
 };
 
 // Only { id, load() } here — the hub/constellation must render using
