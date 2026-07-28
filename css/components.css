@@ -409,8 +409,19 @@ a { color: var(--cor-ouro-300); }
 }
 
 /* ============================================================
-   WAX SEAL — enigma reveal / unlock gesture
+   SELO DE CERA — cera rubi envelhecida com reflexo de bronze, bordas
+   orgânicas e um símbolo celestial gravado. Ao clicar, uma fissura se
+   desenha e o selo se parte por ela.
    ============================================================ */
+
+.selo-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+  margin-top: var(--esp-2);
+}
 
 .selo-wrap {
   position: relative;
@@ -429,7 +440,7 @@ a { color: var(--cor-ouro-300); }
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(240, 200, 105, .22) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(190, 40, 60, .2) 0%, rgba(240, 200, 105, .12) 45%, transparent 72%);
   transition: opacity var(--dur-cena) var(--mov-suave);
 }
 .selo-wrap.is-quebrado .selo-halo { opacity: 0; }
@@ -438,40 +449,98 @@ a { color: var(--cor-ouro-300); }
   position: absolute;
   width: 112px;
   height: 112px;
+  /* Borda orgânica: raios desiguais, como cera derramada. */
   border-radius: 47% 53% 46% 54% / 52% 46% 54% 48%;
-  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 38%, #A8801F 72%, #7A5C15 100%);
-  box-shadow: var(--sombra-selo);
+  background:
+    radial-gradient(circle at 32% 26%, #C6415A 0%, #9E2438 34%, #6E1526 68%, #4A0E1B 100%);
+  box-shadow:
+    0 18px 34px -12px rgba(0, 0, 0, .75),
+    inset 0 2px 0 rgba(255, 190, 190, .35),
+    inset 0 -10px 20px rgba(40, 6, 12, .7);
   animation: seloRespira 5200ms ease-in-out infinite;
 }
 
+/* Anel de bronze em baixo-relevo na borda da cera. */
 .selo-corpo::before {
   content: '';
   position: absolute;
-  inset: 15px;
+  inset: 13px;
   border-radius: 50%;
-  border: 1px solid rgba(90, 62, 10, .4);
-  box-shadow: inset 0 1px 0 rgba(255, 235, 180, .25);
+  border: 1px solid rgba(212, 175, 55, .35);
+  box-shadow: inset 0 1px 0 rgba(255, 210, 170, .22);
 }
 
-.selo-corpo::after {
-  content: '';
+.selo-emblema {
   position: absolute;
-  top: 40px; left: 38px;
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  box-shadow: inset -8px 1px 0 0 rgba(86, 58, 10, .65);
+  inset: 24px;
+  width: auto;
+  height: auto;
+  pointer-events: none;
+}
+
+.selo-emblema__lua {
+  fill: rgba(52, 8, 16, .62);
+}
+.selo-emblema__estrela {
+  fill: rgba(240, 200, 105, .55);
 }
 
 .selo-metade--esq {
-  clip-path: polygon(0 0, 52% 0, 47% 18%, 54% 38%, 46% 60%, 53% 80%, 49% 100%, 0 100%);
+  clip-path: polygon(0 0, 50% 0, 46% 18%, 55% 34%, 44% 52%, 54% 70%, 47% 86%, 51% 100%, 0 100%);
 }
 .selo-metade--dir {
-  clip-path: polygon(52% 0, 100% 0, 100% 100%, 49% 100%, 53% 80%, 46% 60%, 54% 38%, 47% 18%);
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 51% 100%, 47% 86%, 54% 70%, 44% 52%, 55% 34%, 46% 18%);
 }
+
+/* ---- hover: vibra de leve e acende o contorno ---- */
+
+.selo-wrap:hover .selo-corpo,
+.selo-wrap:focus-visible .selo-corpo {
+  animation: seloVibra 320ms ease-in-out infinite;
+  box-shadow:
+    0 18px 34px -12px rgba(0, 0, 0, .75),
+    inset 0 2px 0 rgba(255, 190, 190, .35),
+    inset 0 -10px 20px rgba(40, 6, 12, .7),
+    0 0 22px rgba(240, 200, 105, .55);
+}
+.selo-wrap:focus-visible { outline: none; }
 
 .selo-wrap.is-entrando .selo-corpo {
   animation: seloCarimbo 900ms var(--mov-selo) both;
 }
+
+/* ---- a fissura ---- */
+
+.selo-fissura {
+  position: absolute;
+  inset: 19px;
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.selo-fissura__traco {
+  fill: none;
+  stroke: #2A0710;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+}
+
+.selo-wrap.is-rachando .selo-fissura { opacity: 1; }
+.selo-wrap.is-rachando .selo-fissura__traco {
+  animation: fissuraAbre 300ms var(--mov-suave) forwards;
+}
+
+@keyframes fissuraAbre {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ---- a quebra ---- */
+
+.selo-wrap.is-quebrado .selo-fissura { opacity: 0; transition: opacity 200ms; }
 
 .selo-wrap.is-quebrado .selo-metade--esq {
   animation: seloEsquerda 900ms cubic-bezier(.3, .9, .4, 1) forwards;
@@ -480,28 +549,12 @@ a { color: var(--cor-ouro-300); }
   animation: seloDireita 900ms cubic-bezier(.3, .9, .4, 1) forwards;
 }
 
-.selo-caco {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 12px; height: 12px;
-  background: linear-gradient(140deg, #F0C869, #8A6B1F);
-  opacity: 0;
-  pointer-events: none;
-}
-.selo-wrap.is-quebrado .selo-caco { opacity: 1; }
-.selo-wrap.is-quebrado .selo-caco:nth-child(1) { animation: cacoA 760ms var(--mov-suave) forwards; }
-.selo-wrap.is-quebrado .selo-caco:nth-child(2) { animation: cacoB 820ms var(--mov-suave) 40ms forwards; }
-.selo-wrap.is-quebrado .selo-caco:nth-child(3) { animation: cacoC 880ms var(--mov-suave) 80ms forwards; }
-.selo-wrap.is-quebrado .selo-caco:nth-child(4) { animation: cacoA 940ms var(--mov-suave) 120ms forwards reverse; }
-.selo-wrap.is-quebrado .selo-caco:nth-child(5) { animation: cacoB 1000ms var(--mov-suave) 160ms forwards reverse; }
-.selo-wrap.is-quebrado .selo-caco:nth-child(6) { animation: cacoC 1060ms var(--mov-suave) 200ms forwards reverse; }
-
 .selo-legenda {
   margin-top: var(--esp-3);
   opacity: .42;
   transition: opacity var(--dur-padrao) var(--mov-suave);
 }
-.selo-wrap.is-quebrado + .selo-legenda { opacity: 0; }
+.selo-legenda.is-saindo { opacity: 0; }
 
 /* Orphaned: superseded by .carta-* below (the seal now reveals a
    letter to open, not an inline paragraph panel). Left in place,
@@ -592,20 +645,106 @@ a { color: var(--cor-ouro-300); }
 }
 
 .carta-aberta__pergaminho {
+  position: relative;
   background: linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
   border: 1px solid var(--cor-perg-sombra);
   box-shadow: 0 20px 50px -20px rgba(0, 0, 0, .7);
-  color: var(--cor-perg-tinta) !important;
-  padding: var(--esp-5);
+  color: var(--cor-perg-tinta);
+  padding: var(--esp-5) var(--esp-6);
   max-width: min(var(--coluna-texto), 90%);
+  text-align: left;
 }
-.carta-aberta__pergaminho p {
+
+/* Fio interno — a moldura dupla do pergaminho. */
+.carta-aberta__pergaminho::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(107, 78, 46, .3);
+  pointer-events: none;
+}
+
+.carta-aberta__canto {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid var(--cor-ouro-600);
+  pointer-events: none;
+}
+.carta-aberta__canto--tl { top: 4px; left: 4px; border-top-width: 2px; border-left-width: 2px; }
+.carta-aberta__canto--tr { top: 4px; right: 4px; border-top-width: 2px; border-right-width: 2px; }
+.carta-aberta__canto--bl { bottom: 4px; left: 4px; border-bottom-width: 2px; border-left-width: 2px; }
+.carta-aberta__canto--br { bottom: 4px; right: 4px; border-bottom-width: 2px; border-right-width: 2px; }
+
+.carta-aberta__titulo {
+  font-family: var(--fonte-exib);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2.8vw, 1.8rem);
+  letter-spacing: .02em;
+  color: var(--cor-perg-sombra);
+  text-align: center;
+  margin-bottom: var(--esp-3);
+  padding-bottom: var(--esp-2);
+  border-bottom: 1px solid rgba(107, 78, 46, .28);
+}
+
+.carta-aberta__texto {
+  font-family: var(--fonte-exib);
+  font-weight: 400;
+  font-size: clamp(1.05rem, 2.1vw, 1.22rem);
+  line-height: 1.8;
   color: var(--cor-perg-tinta);
 }
-.carta-aberta__pergaminho [data-linha] {
+.carta-aberta__texto p + p { margin-top: 1rem; }
+
+/* Capitular iluminada: só a primeira letra do primeiro parágrafo.
+   Feita com ::first-letter para o conteúdo continuar sendo texto puro
+   no arquivo de dados (sem marcação especial). */
+.carta-aberta__texto p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--fonte-exib);
+  font-weight: 500;
+  font-size: 3.6em;
+  line-height: .82;
+  padding: .06em .12em 0 0;
+  margin-right: .04em;
+  color: var(--cor-ouro-700);
+  text-shadow:
+    0 1px 0 rgba(255, 240, 202, .8),
+    0 0 14px rgba(212, 175, 55, .45);
+}
+
+.carta-aberta__texto [data-linha] {
   opacity: 0;
   transform: translateY(10px);
   animation: subeEntra 700ms var(--mov-entrada) forwards;
+}
+
+/* ---- botão Art Nouveau (rodapé da carta) ---- */
+
+.btn-cta--nouveau {
+  position: relative;
+  border-color: rgba(212, 175, 55, .6);
+  background: rgba(10, 15, 29, .55);
+  padding: 15px 40px;
+}
+
+.btn-cta--nouveau::before,
+.btn-cta--nouveau::after {
+  content: '';
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 0 solid var(--cor-ouro-500);
+  pointer-events: none;
+}
+.btn-cta--nouveau::before {
+  top: -1px; left: -1px;
+  border-top-width: 2px; border-left-width: 2px;
+}
+.btn-cta--nouveau::after {
+  bottom: -1px; right: -1px;
+  border-bottom-width: 2px; border-right-width: 2px;
 }
 
 /* ============================================================
@@ -1358,6 +1497,14 @@ a { color: var(--cor-ouro-300); }
   50% { transform: scale(1.022); }
 }
 
+/* Vibração sutil no hover do selo. */
+@keyframes seloVibra {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25%      { transform: translate(-1.2px, .6px) rotate(-.7deg); }
+  50%      { transform: translate(1px, -.8px) rotate(.6deg); }
+  75%      { transform: translate(-.7px, -.5px) rotate(-.4deg); }
+}
+
 @keyframes seloCarimbo {
   0%   { transform: scale(.4) rotate(-12deg); opacity: 0; filter: blur(8px); }
   55%  { transform: scale(1.12) rotate(3deg); opacity: 1; filter: blur(0); }
@@ -1371,6 +1518,8 @@ a { color: var(--cor-ouro-300); }
   to { transform: translate(104px, 26px) rotate(15deg); opacity: 0; }
 }
 
+/* ÓRFÃOS: os cacos soltos do selo antigo. O selo novo se parte pela
+   fissura e usa o particle-burst para os estilhaços. */
 @keyframes cacoA { to { transform: translate(-70px, -96px) rotate(180deg); opacity: 0; } }
 @keyframes cacoB { to { transform: translate(88px, -74px) rotate(-150deg); opacity: 0; } }
 @keyframes cacoC { to { transform: translate(-24px, -130px) rotate(96deg); opacity: 0; } }
@@ -1403,6 +1552,25 @@ a { color: var(--cor-ouro-300); }
 @keyframes particulaEstoura {
   0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.3); opacity: 0; }
+}
+
+/* Faíscas curtas no ponto onde uma conexão da constelação acerta. */
+.particula-faisca {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #FFF0CA;
+  box-shadow: 0 0 6px rgba(240, 200, 105, .95);
+  transform: translate(-50%, -50%);
+  animation: faiscaSalta 620ms ease-out forwards;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes faiscaSalta {
+  0%   { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); opacity: 0; }
 }
 
 /* ---- floating musical notes — chapter 5's success payoff ---- */

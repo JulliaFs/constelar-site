@@ -1,47 +1,59 @@
 // ============================================================================
 // CAPÍTULO 1 — "A Primeira Luz" (tipo constellation-puzzle)
-// Ligar as estrelas nas conexões certas forma uma constelação simples
-// (aqui, o desenho da Ursa Maior/"panela"). Troque nodes/edges por outro
-// desenho se quiser — só precisa continuar um grafo conectado de 6-8 nós.
+// A constelação é a Lira (Lyra): o triângulo de Vega no topo e o
+// paralelogramo do corpo do instrumento embaixo.
+//
+// x/y são porcentagens do palco do desafio, então a figura se adapta
+// sozinha ao tamanho da tela.
 // ============================================================================
 
 export default {
   id: 'ch1-primeira-luz',
   type: 'constellation-puzzle',
-  title: 'Constelação I — A Primeira Luz',
+  title: 'Capítulo I — A Primeira Luz',
+  subtitle: 'A Harpa do Firmamento',
   intro: ['Toda jornada começa com uma estrela. Encontre o caminho e desperte a primeira memória.'],
   startLabel: 'Iniciar desafio',
 
   puzzle: {
-    // x/y em porcentagem (0-100) da área do desafio.
+    // Estrela de destaque: ganha uma aura dupla creme/dourada.
+    mainStarId: 'vega',
+
     nodes: [
-      { id: 'n1', x: 15, y: 62 },
-      { id: 'n2', x: 29, y: 50 },
-      { id: 'n3', x: 44, y: 44 },
-      { id: 'n4', x: 60, y: 47 },
-      { id: 'n5', x: 74, y: 36 },
-      { id: 'n6', x: 70, y: 60 },
-      { id: 'n7', x: 51, y: 66 },
+      { id: 'vega',  label: 'Vega (α Lyrae)', x: 50, y: 20, isAlpha: true },
+      { id: 'eps',   label: 'ε Lyrae',        x: 62, y: 30 },
+      { id: 'zeta',  label: 'ζ Lyrae',        x: 38, y: 38 },
+      { id: 'delta', label: 'δ Lyrae',        x: 62, y: 48 },
+      { id: 'beta',  label: 'Sheliak (β)',    x: 35, y: 72 },
+      { id: 'gamma', label: 'Sulafat (γ)',    x: 58, y: 80 },
     ],
-    // Únicas conexões válidas (ordem não importa). Qualquer outro par
-    // tentado só pisca e some, sem punição.
+
+    // Únicas conexões válidas (a ordem do par não importa). Qualquer
+    // outro par tentado apenas se desfaz, sem punição.
     edges: [
-      ['n1', 'n2'],
-      ['n2', 'n3'],
-      ['n3', 'n4'],
-      ['n4', 'n5'],
-      ['n5', 'n6'],
-      ['n6', 'n7'],
-      ['n7', 'n4'],
+      // Triângulo do topo (Vega)
+      ['vega', 'eps'],
+      ['eps', 'zeta'],
+      ['zeta', 'vega'],
+
+      // Ligação do triângulo ao corpo
+      ['zeta', 'delta'],
+      ['zeta', 'beta'],
+
+      // Paralelogramo inferior
+      ['delta', 'gamma'],
+      ['beta', 'gamma'],
     ],
   },
 
   // Mostrado dentro da carta, depois que o selo se rompe.
   reveal: {
+    title: 'Carta da Primeira Luz',
     paragraphs: [
-      '[TEXTO DA CARTA 1 PLACEHOLDER]',
+      'Assim como a estrela Vega guia os navegantes na escuridão, esta primeira luz ilumina o começo da nossa jornada...',
+      '[ESCREVA AQUI O SEU TEXTO POÉTICO]',
     ],
-    continueLabel: 'Fechar',
+    continueLabel: 'Guardar Carta no Céu',
   },
 
   sky: { nebulaTint: 0.08 },

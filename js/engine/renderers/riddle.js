@@ -189,10 +189,8 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
 
     const seal = buildWaxSeal({
       size: isMelody ? 'grande' : 'normal',
-      onBreak: () => {
-        onSealBroken?.();
-        showCartaStage();
-      },
+      onBreak: () => onSealBroken?.(),
+      onRevealed: showCartaStage,
     });
     stage.appendChild(seal.el);
     if (freshlySolved) {
@@ -206,6 +204,7 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
   function showCartaStage() {
     stage.innerHTML = '';
     const carta = buildCarta({
+      titulo: chapter.reveal.title,
       paragraphs: chapter.reveal.paragraphs,
       closeLabel: chapter.reveal.continueLabel,
       onClose: onComplete,

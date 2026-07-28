@@ -1,13 +1,16 @@
 /**
- * The letter/card reveal: appears (closed) right after a wax seal
- * breaks. The reader clicks it to open and read the real content;
- * closing it is what completes the chapter (same `onComplete`
- * contract every renderer already uses).
+ * A carta: aparece fechada logo depois que o selo de cera se rompe. A
+ * leitora clica para abrir e ler; fechar é o que conclui o capítulo
+ * (mesmo contrato `onComplete` que todos os renderers já usam).
  *
- * @param {{paragraphs: string[], closeLabel?: string, onClose: () => void}} opts
+ * O primeiro parágrafo recebe uma capitular iluminada (drop cap) via
+ * `::first-letter` no CSS — nada de marcação especial no conteúdo, então
+ * o texto continua sendo texto puro no arquivo de dados.
+ *
+ * @param {{titulo?: string, paragraphs: string[], closeLabel?: string, onClose: () => void}} opts
  * @returns {{el: HTMLElement, open: () => void}}
  */
-export function buildCarta({ paragraphs, closeLabel, onClose }) {
+export function buildCarta({ titulo, paragraphs, closeLabel, onClose }) {
   const area = document.createElement('div');
   area.className = 'carta-area';
 
@@ -32,14 +35,26 @@ export function buildCarta({ paragraphs, closeLabel, onClose }) {
     const aberta = document.createElement('div');
     aberta.className = 'carta-aberta';
     aberta.innerHTML = `
-      <div class="carta-aberta__pergaminho txt-corpo">
-        ${paragraphs.map((p, i) => `<p data-linha style="animation-delay:${i * 140}ms">${p}</p>`).join('')}
+      <div class="carta-aberta__pergaminho">
+        <span class="carta-aberta__canto carta-aberta__canto--tl"></span>
+        <span class="carta-aberta__canto carta-aberta__canto--tr"></span>
+        <span class="carta-aberta__canto carta-aberta__canto--bl"></span>
+        <span class="carta-aberta__canto carta-aberta__canto--br"></span>
+        ${titulo ? `<h2 class="carta-aberta__titulo">${titulo}</h2>` : ''}
+        <div class="carta-aberta__texto">
+          ${paragraphs.map((p, i) => `<p data-linha style="animation-delay:${i * 140}ms">${p}</p>`).join('')}
+        </div>
       </div>
-      <button type="button" class="btn-cta carta-aberta__fechar">${closeLabel || 'Fechar'}</button>
+      <button type="button" class="btn-cta btn-cta--nouveau carta-aberta__fechar">
+        <span class="fagulha"></span><span>${closeLabel || 'Fechar'}</span>
+      </button>
     `;
     area.appendChild(aberta);
 
-    requestAnimationFrame(() => aberta.classList.add('visivel'));
+    // Reflow forçado em vez de requestAnimationFrame: rAF não roda em aba
+    // em segundo plano, e a carta não pode ficar presa invisível.
+    void aberta.offsetWidth;
+    aberta.classList.add('visivel');
 
     aberta.querySelector('.carta-aberta__fechar').addEventListener('click', () => onClose?.());
   }

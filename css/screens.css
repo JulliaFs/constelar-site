@@ -178,7 +178,7 @@
 }
 
 /* ============================================================
-   CONSTELLATION PUZZLE (chapter 1 — connect the correct stars)
+   PUZZLE DA CONSTELAÇÃO (capítulo 1 — ligar as estrelas certas)
    ============================================================ */
 
 .tela-puzzle {
@@ -189,22 +189,24 @@
   width: 100%;
 }
 
+.tela-puzzle__subtitulo {
+  font-family: var(--fonte-exib);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  letter-spacing: .06em;
+  color: var(--cor-ouro-300);
+  opacity: .82;
+}
+
 .puzzle-estagio {
   position: relative;
-  width: 100%;
-  max-width: 520px;
-  aspect-ratio: 4 / 3;
+  width: min(460px, 78vw);
+  aspect-ratio: 1;
+  touch-action: manipulation;
 }
 
-.puzzle-estagio.is-completo {
-  animation: puzzleCompletoGlow 900ms ease-out;
-}
-
-@keyframes puzzleCompletoGlow {
-  0%   { filter: brightness(1); }
-  40%  { filter: brightness(1.7) drop-shadow(0 0 34px rgba(240, 200, 105, .6)); }
-  100% { filter: brightness(1); }
-}
+/* ---- linhas ---- */
 
 .puzzle-linhas {
   position: absolute;
@@ -212,53 +214,207 @@
   width: 100%;
   height: 100%;
   overflow: visible;
+  pointer-events: none;
 }
 
-.puzzle-linha--aceso {
-  stroke: var(--cor-ouro-500);
-  stroke-width: 1.4;
-  filter: drop-shadow(0 0 4px rgba(240, 200, 105, .7));
+.puzzle-linha {
+  stroke-linecap: round;
 }
 
+/* Conexão correta: fio de luz neon com halo dourado. */
+.puzzle-linha--acesa {
+  stroke: #FFF0CA;
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 8px #D4AF37);
+  animation: puzzleLinhaAcende 520ms var(--mov-entrada) both;
+}
+
+@keyframes puzzleLinhaAcende {
+  0%   { opacity: 0; filter: drop-shadow(0 0 16px #D4AF37) brightness(2.2); }
+  60%  { opacity: 1; filter: drop-shadow(0 0 14px #D4AF37) brightness(1.6); }
+  100% { opacity: 1; filter: drop-shadow(0 0 8px #D4AF37) brightness(1); }
+}
+
+/* Conexão incorreta: apenas se desfaz. */
 .puzzle-linha--tentativa {
   stroke: var(--cor-pergaminho-50);
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
-  animation: puzzleTentativaSome 400ms ease-out forwards;
+  stroke-width: 1.2;
+  stroke-dasharray: 3 4;
+  animation: puzzleTentativaSome 420ms ease-out forwards;
 }
 
 @keyframes puzzleTentativaSome {
-  to { opacity: 0; }
+  0%   { opacity: .75; }
+  100% { opacity: 0; }
 }
+
+/* Linha de mira, seguindo o ponteiro. */
+.puzzle-mira {
+  stroke: var(--cor-ouro-300);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 5;
+  stroke-linecap: round;
+  opacity: 0;
+  filter: drop-shadow(0 0 5px rgba(240, 200, 105, .7));
+}
+.puzzle-mira.is-ativa {
+  opacity: .8;
+}
+
+/* ---- estrelas ---- */
 
 .puzzle-no {
   position: absolute;
-  width: 16px;
-  height: 16px;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: var(--cor-pergaminho-22);
-  border: none;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   padding: 0;
-  transition: background var(--dur-rapido) var(--mov-suave), box-shadow var(--dur-rapido) var(--mov-suave), transform var(--dur-rapido) var(--mov-suave);
+  border: none;
+  background: none;
+  cursor: pointer;
+  z-index: 2;
 }
 
-.puzzle-no:hover {
-  background: var(--cor-pergaminho-50);
+.puzzle-no__glifo {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: transform var(--dur-rapido) var(--mov-suave);
 }
 
-.puzzle-no.is-selecionado {
-  background: var(--cor-ouro-300);
-  box-shadow: 0 0 14px rgba(240, 200, 105, .7);
-  transform: translate(-50%, -50%) scale(1.35);
+.puzzle-no__corpo {
+  fill: #D4AF37;
+  opacity: .62;
+  transition: opacity var(--dur-rapido) var(--mov-suave), filter var(--dur-rapido) var(--mov-suave);
+}
+.puzzle-no__faisca { fill: #F0C869; opacity: .5; }
+.puzzle-no__nucleo { fill: #FFF0CA; }
+
+.puzzle-no__aura {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100%; height: 100%;
+  transform: translate(-50%, -50%) scale(1.9);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, .18) 0%, transparent 68%);
+  pointer-events: none;
 }
 
-.puzzle-no.is-aceso {
-  background: var(--cor-ouro-300);
-  box-shadow: 0 0 10px rgba(240, 200, 105, .6);
+.puzzle-no:hover .puzzle-no__corpo,
+.puzzle-no:focus-visible .puzzle-no__corpo {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(240, 200, 105, .8));
+}
+.puzzle-no:focus-visible { outline: none; }
+
+.puzzle-no.is-selecionado .puzzle-no__glifo {
+  transform: scale(1.28);
+}
+.puzzle-no.is-selecionado .puzzle-no__corpo {
+  fill: #FFF0CA;
+  opacity: 1;
+  filter: drop-shadow(0 0 12px #D4AF37);
 }
 
+.puzzle-no.is-aceso .puzzle-no__corpo {
+  opacity: 1;
+  filter: drop-shadow(0 0 9px rgba(240, 200, 105, .85));
+}
+.puzzle-no.is-aceso .puzzle-no__faisca { opacity: .95; }
+
+/* Estrela alpha (Vega): maior, com aura dupla creme/dourada. */
+.puzzle-no--alpha {
+  width: 48px;
+  height: 48px;
+  z-index: 3;
+}
+.puzzle-no--alpha .puzzle-no__corpo {
+  fill: #F0C869;
+  opacity: .9;
+  filter: drop-shadow(0 0 10px rgba(255, 240, 202, .8));
+}
+.puzzle-no--alpha .puzzle-no__aura {
+  background:
+    radial-gradient(circle, rgba(255, 240, 202, .3) 0%, rgba(255, 240, 202, 0) 42%),
+    radial-gradient(circle, rgba(212, 175, 55, .22) 44%, rgba(212, 175, 55, 0) 72%);
+  animation: puzzleAlphaPulsa 3600ms ease-in-out infinite;
+}
+
+@keyframes puzzleAlphaPulsa {
+  0%, 100% { transform: translate(-50%, -50%) scale(1.8); opacity: .7; }
+  50%      { transform: translate(-50%, -50%) scale(2.5); opacity: 1; }
+}
+
+/* Nome da estrela, no hover/foco. */
+.puzzle-no__nome {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--fonte-nota);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  color: var(--cor-ouro-300);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-rapido) var(--mov-suave);
+}
+.puzzle-no:hover .puzzle-no__nome,
+.puzzle-no:focus-visible .puzzle-no__nome,
+.puzzle-no.is-selecionado .puzzle-no__nome {
+  opacity: .9;
+}
+
+/* ---- conclusão: a figura pulsa e a harpa aparece ---- */
+
+.puzzle-estagio.is-completo {
+  animation: puzzleCompletoGlow 1200ms ease-out;
+}
+.puzzle-estagio.is-completo .puzzle-no {
+  pointer-events: none;
+}
+
+@keyframes puzzleCompletoGlow {
+  0%   { filter: brightness(1); }
+  30%  { filter: brightness(1.9) drop-shadow(0 0 36px rgba(240, 200, 105, .75)); }
+  55%  { filter: brightness(1.2); }
+  75%  { filter: brightness(1.7) drop-shadow(0 0 28px rgba(240, 200, 105, .6)); }
+  100% { filter: brightness(1); }
+}
+
+.puzzle-harpa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+  animation: harpaSurge 1200ms var(--mov-entrada) forwards;
+}
+
+.puzzle-harpa__traco > * {
+  fill: none;
+  stroke: var(--cor-ouro-300);
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 6px rgba(240, 200, 105, .7));
+}
+.puzzle-harpa__corda {
+  stroke-width: .7;
+  stroke-opacity: .7;
+}
+
+@keyframes harpaSurge {
+  0%   { opacity: 0; transform: scale(.94); }
+  35%  { opacity: .95; transform: scale(1); }
+  70%  { opacity: .75; }
+  100% { opacity: 0; transform: scale(1.03); }
+}
 /* ============================================================
    ASTROLABE (chapter 3 — 3 draggable concentric rings)
    ============================================================ */
@@ -347,6 +503,8 @@
   gap: var(--esp-3);
 }
 
+/* ÓRFÃO: o selo agora monta em .selo-area (components.css), que precisa
+   de position:relative para as partículas do estouro. */
 .tela-enigma__selo-area {
   display: flex;
   flex-direction: column;

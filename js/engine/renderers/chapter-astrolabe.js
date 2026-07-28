@@ -196,10 +196,8 @@ export function renderAstrolabe(appRoot, chapter, resume, { onSolved, onSealBrok
   function showSolvedStage({ freshlySolved = false } = {}) {
     stage.innerHTML = '';
     const seal = buildWaxSeal({
-      onBreak: () => {
-        onSealBroken?.();
-        showCartaStage();
-      },
+      onBreak: () => onSealBroken?.(),
+      onRevealed: showCartaStage,
     });
     stage.appendChild(seal.el);
     if (freshlySolved) {
@@ -212,6 +210,7 @@ export function renderAstrolabe(appRoot, chapter, resume, { onSolved, onSealBrok
   function showCartaStage() {
     stage.innerHTML = '';
     const carta = buildCarta({
+      titulo: chapter.reveal.title,
       paragraphs: chapter.reveal.paragraphs,
       closeLabel: chapter.reveal.continueLabel,
       onClose: onComplete,
