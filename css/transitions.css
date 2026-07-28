@@ -46,7 +46,8 @@
 
 /* ---- star-zoom: hub -> chapter entry ---- */
 
-.pagina.is-zoom-saida {
+.pagina.is-zoom-saida,
+.mapa-ceu.is-zoom-saida {
   animation: mapaZoomSaida 560ms var(--mov-suave) forwards;
   transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
 }

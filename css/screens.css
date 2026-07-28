@@ -100,8 +100,30 @@
 }
 
 /* ============================================================
-   HUB (star map / large constellation)
+   HUB — mapa celeste em tela cheia.
+   Sem container, sem moldura: o próprio céu (gradiente global no <body>)
+   + a poeira estelar do tsParticles ficam visíveis através do mapa, que
+   é transparente. O componente em si vive em components.css (.mapa-*).
    ============================================================ */
+
+.mapa-ceu__rotulo {
+  position: absolute;
+  top: clamp(20px, 5vh, 52px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fonte-texto);
+  font-weight: 500;
+  font-size: .72rem;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: var(--cor-pergaminho-30);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---- ÓRFÃOS: layout antigo do hub (a "caixa" com legenda e contador),
+   substituído pelo mapa celeste em tela cheia. As classes .constelacao*
+   continuam EM USO pelo breadcrumb dos capítulos e pelo finale. ---- */
 
 .tela-mapa {
   display: flex;

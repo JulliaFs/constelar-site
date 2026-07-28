@@ -47,3 +47,84 @@ export function layoutConstellation(ids, opts = {}) {
     return { id, x, y };
   });
 }
+
+// ============================================================================
+// Layout orgânico do mapa celeste (tela cheia).
+//
+// Em vez de uma faixa horizontal, as estrelas seguem uma "varredura"
+// serpenteante pelo céu — o traçado abaixo é o esqueleto da constelação.
+// As coordenadas saem em PORCENTAGEM (0-100), então a disposição se adapta
+// sozinha a qualquer tamanho de tela sem recalcular nada em pixels.
+// ============================================================================
+
+// Âncoras do traçado, em % da tela. Editar aqui muda o "desenho" da
+// constelação inteira; a quantidade de capítulos é independente disso.
+const TRACADO = [
+  { x: 13, y: 70 },
+  { x: 26, y: 43 },
+  { x: 41, y: 60 },
+  { x: 55, y: 28 },
+  { x: 70, y: 50 },
+  { x: 86, y: 24 },
+];
+
+const LIMITES = { minX: 9, maxX: 91, minY: 15, maxY: 78 };
+
+function pontoNoTracado(t) {
+  if (t <= 0) return { ...TRACADO[0] };
+  if (t >= 1) return { ...TRACADO[TRACADO.length - 1] };
+
+  // Comprimentos acumulados para amostrar o traçado de forma uniforme.
+  const segmentos = [];
+  let total = 0;
+  for (let i = 0; i < TRACADO.length - 1; i++) {
+    const len = Math.hypot(TRACADO[i + 1].x - TRACADO[i].x, TRACADO[i + 1].y - TRACADO[i].y);
+    segmentos.push(len);
+    total += len;
+  }
+
+  let alvo = t * total;
+  for (let i = 0; i < segmentos.length; i++) {
+    if (alvo <= segmentos[i]) {
+      const f = segmentos[i] === 0 ? 0 : alvo / segmentos[i];
+      return {
+        x: TRACADO[i].x + (TRACADO[i + 1].x - TRACADO[i].x) * f,
+        y: TRACADO[i].y + (TRACADO[i + 1].y - TRACADO[i].y) * f,
+      };
+    }
+    alvo -= segmentos[i];
+  }
+  return { ...TRACADO[TRACADO.length - 1] };
+}
+
+const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+/**
+ * Posições orgânicas em % para o mapa celeste em tela cheia.
+ * Determinístico (mesma seed por id), então a constelação é sempre a
+ * mesma entre sessões — e adicionar um capítulo redistribui o traçado
+ * sozinho, sem escolher coordenadas à mão.
+ *
+ * @param {string[]} ids - ids na ordem de leitura
+ * @returns {{id: string, x: number, y: number}[]} x/y em porcentagem (0-100)
+ */
+export function layoutOrganicConstellation(ids) {
+  const n = ids.length;
+
+  return ids.map((id, i) => {
+    const rand = mulberry32(hashString(id));
+    const t = n <= 1 ? 0.5 : i / (n - 1);
+    const base = pontoNoTracado(t);
+
+    // Deslocamento sutil por id: tira a regularidade do traçado sem
+    // deixar duas estrelas colidirem.
+    const desvioX = (rand() - 0.5) * 6.5;
+    const desvioY = (rand() - 0.5) * 8;
+
+    return {
+      id,
+      x: clamp(base.x + desvioX, LIMITES.minX, LIMITES.maxX),
+      y: clamp(base.y + desvioY, LIMITES.minY, LIMITES.maxY),
+    };
+  });
+}

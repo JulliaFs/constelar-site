@@ -9,7 +9,13 @@
 
 html, body {
   height: 100%;
-  background: var(--cor-noite-900);
+  /* Céu profundo global: azul-noite no centro, preto estelar nas bordas.
+     Fica no <body> (abaixo da camada de partículas) para o mapa celeste
+     poder ser totalmente transparente e deixar a poeira estelar aparecer. */
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 42%, #0B1120 0%, #070B14 55%, #03050C 100%)
+    var(--cor-noite-900);
+  background-attachment: fixed;
   color: var(--cor-pergaminho);
   font-family: var(--fonte-texto);
   overflow-x: hidden;
@@ -46,7 +52,9 @@ a { color: var(--cor-ouro-300); }
   align-items: center;
   justify-content: center;
   padding: 4vh 4vw;
-  perspective: 2400px;
+  /* A perspectiva do virar-página vive em .pagina, não aqui: um ancestral
+     com `perspective` vira bloco de contenção de `position: fixed`, o que
+     impediria o mapa celeste de ocupar a viewport inteira. */
 }
 
 /* ============================================================
@@ -117,6 +125,7 @@ a { color: var(--cor-ouro-300); }
   box-shadow: var(--sombra-abobada);
   overflow: hidden;
   transform-style: preserve-3d;
+  perspective: 2400px;
 }
 
 .pagina__ceu {
@@ -900,6 +909,278 @@ a { color: var(--cor-ouro-300); }
 @keyframes astroHalo {
   0%   { opacity: .9; r: 62; stroke-width: 2.4; }
   100% { opacity: 0; r: 168; stroke-width: .4; }
+}
+
+/* ============================================================
+   MAPA CELESTE — a carta estelar do hub, em tela cheia.
+   Sem moldura, sem caixa: o céu É a tela.
+   ============================================================ */
+
+.mapa-ceu {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  animation: mapaEntra var(--dur-cena) var(--mov-entrada) both;
+}
+
+/* ---- carta astronômica decorativa de fundo ---- */
+
+.mapa-ceu__zodiaco {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: .1;
+  animation: zodiacoGira 240s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.mapa-ceu__zodiaco-traco > * {
+  stroke: var(--cor-ouro-500);
+  stroke-width: 1;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+@keyframes zodiacoGira {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- linhas de conexão ---- */
+
+.mapa-ceu__linhas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.mapa-linha {
+  stroke: var(--cor-estelar);
+  stroke-opacity: .16;
+  stroke-width: 1;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+}
+
+.mapa-linha--acesa {
+  stroke: #D4AF37;
+  stroke-opacity: .95;
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 6px #D4AF37);
+}
+
+/* A linha da estrela recém-conquistada se desenha na tela. */
+.mapa-linha--acesa.is-desenhando {
+  stroke-dasharray: var(--comprimento, 400);
+  stroke-dashoffset: var(--comprimento, 400);
+  animation: mapaLinhaDesenha var(--dur-ritual) var(--mov-suave) forwards;
+}
+
+@keyframes mapaLinhaDesenha {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ---- estrelas ---- */
+
+.mapa-estrela {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  z-index: 2;
+}
+
+.estrela__glifo {
+  position: relative;
+  display: block;
+  overflow: visible;
+}
+
+.estrela__aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* -- disponível (o próximo capítulo) -- */
+
+.mapa-estrela--atual {
+  cursor: pointer;
+}
+
+.mapa-estrela--atual .estrela__glifo {
+  width: 58px;
+  height: 58px;
+  animation: estrelaPulsa 3400ms ease-in-out infinite;
+}
+
+.mapa-estrela--atual .estrela__corpo {
+  fill: var(--cor-ouro-300);
+  filter: drop-shadow(0 0 10px rgba(240, 200, 105, .9));
+}
+.mapa-estrela--atual .estrela__faisca { fill: #FFF6DF; }
+.mapa-estrela--atual .estrela__nucleo { fill: #FFFDF6; }
+
+.mapa-estrela--atual .estrela__aura {
+  width: 58px;
+  height: 58px;
+  background: radial-gradient(circle, rgba(240, 200, 105, .38) 0%, rgba(240, 200, 105, 0) 68%);
+  animation: estrelaAura 3400ms ease-in-out infinite;
+}
+
+@keyframes estrelaPulsa {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.09); }
+}
+
+@keyframes estrelaAura {
+  0%, 100% { transform: translate(-50%, -50%) scale(1.6); opacity: .55; }
+  50%      { transform: translate(-50%, -50%) scale(2.5); opacity: .95; }
+}
+
+/* -- concluído -- */
+
+.mapa-estrela--completo .estrela__glifo {
+  width: 38px;
+  height: 38px;
+}
+.mapa-estrela--completo .estrela__corpo {
+  fill: var(--cor-ouro-500);
+  filter: drop-shadow(0 0 7px rgba(212, 175, 55, .85));
+}
+.mapa-estrela--completo .estrela__faisca { fill: var(--cor-ouro-300); }
+.mapa-estrela--completo .estrela__nucleo { fill: #FFF6DF; }
+
+.mapa-estrela--completo .estrela__aura {
+  width: 38px;
+  height: 38px;
+  background: radial-gradient(circle, rgba(212, 175, 55, .22) 0%, rgba(212, 175, 55, 0) 70%);
+  transform: translate(-50%, -50%) scale(1.9);
+}
+
+/* -- bloqueado -- */
+
+.mapa-estrela--bloqueado {
+  pointer-events: none;
+}
+.mapa-estrela--bloqueado .estrela__glifo {
+  width: 22px;
+  height: 22px;
+  opacity: .4;
+}
+.mapa-estrela--bloqueado .estrela__ponto {
+  fill: #C8D2E4;
+}
+
+/* ---- card flutuante (Art Nouveau + glassmorphism) ---- */
+
+.mapa-estrela:hover,
+.mapa-estrela:focus-visible,
+.mapa-estrela:focus-within {
+  z-index: 6;
+  outline: none;
+}
+
+.mapa-card {
+  /* Centralizado na estrela; quando a estrela está perto da borda da tela,
+     star-map.js (ajustarCards) corrige com uma margin-left medida. */
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: 50%;
+  width: max-content;
+  max-width: min(280px, 60vw);
+  padding: var(--esp-3) var(--esp-4);
+  background: rgba(10, 15, 29, .85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 175, 55, .55);
+  box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .8), 0 0 22px rgba(240, 200, 105, .1);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition: opacity var(--dur-rapido) var(--mov-suave), transform var(--dur-rapido) var(--mov-suave);
+}
+
+/* Segunda linha de ouro — a borda dupla clássica. */
+.mapa-card::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(212, 175, 55, .28);
+  pointer-events: none;
+}
+
+.mapa-estrela.is-card-abaixo .mapa-card {
+  bottom: auto;
+  top: calc(100% + 16px);
+  transform: translate(-50%, -6px);
+}
+
+.mapa-estrela:hover .mapa-card,
+.mapa-estrela:focus-visible .mapa-card,
+.mapa-estrela:focus-within .mapa-card {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.mapa-card__canto {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 0 solid var(--cor-ouro-500);
+  pointer-events: none;
+}
+.mapa-card__canto--tl { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.mapa-card__canto--tr { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
+.mapa-card__canto--bl { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
+.mapa-card__canto--br { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+.mapa-card__titulo {
+  font-family: var(--fonte-exib);
+  font-weight: 400;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  letter-spacing: .01em;
+  color: var(--cor-ouro-300);
+}
+
+.mapa-card__subtitulo {
+  margin-top: 6px;
+  font-family: var(--fonte-exib);
+  font-style: italic;
+  font-weight: 300;
+  font-size: .92rem;
+  line-height: 1.5;
+  color: var(--cor-pergaminho-60);
+}
+
+@keyframes mapaEntra {
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 640px) {
+  .mapa-estrela--atual .estrela__glifo,
+  .mapa-estrela--atual .estrela__aura { width: 46px; height: 46px; }
+  .mapa-estrela--completo .estrela__glifo,
+  .mapa-estrela--completo .estrela__aura { width: 30px; height: 30px; }
+  .mapa-card { max-width: 62vw; padding: var(--esp-2) var(--esp-3); }
+  .mapa-card__titulo { font-size: 1rem; }
+  .mapa-card__subtitulo { font-size: .82rem; }
 }
 
 /* ============================================================
