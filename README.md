@@ -111,6 +111,30 @@ Copie o valor impresso para `riddle.answerPayload`. No capítulo 4 (runas), a
 "resposta certa" gerada aqui deve ser exatamente a mesma frase colocada em
 `riddle.runeMessage` (é o que a pessoa precisa decifrar e digitar de volta).
 
+## Modo editor de cartas (só para quem escreve)
+
+Serve para escrever os textos das cartas vendo o resultado na tela, sem
+ficar indo e voltando no arquivo de config.
+
+**Ligar/desligar**: triplo clique no título da capa, ou `Ctrl + Shift + E`
+de qualquer tela. Um aviso confirma a troca. A escolha fica salva, então
+dá pra recarregar a página sem perder o modo.
+
+**Com o modo ligado**, ao abrir uma carta:
+- o título e os parágrafos ficam editáveis direto na tela;
+- aparece uma barra com **+ Adicionar Parágrafo** e **📋 Copiar Config do
+  Capítulo**;
+- o botão de copiar monta o arquivo `config/chapters/<id>.js` inteiro com
+  os textos que estão na tela e joga na área de transferência — é só colar
+  por cima do arquivo. Se o navegador bloquear a cópia automática, o código
+  aparece num painel já selecionado para `Ctrl+C`.
+
+**Com o modo desligado** (o padrão) nada disso existe no DOM: quem recebe o
+presente vê a experiência limpa, sem botões nem contornos de edição.
+
+⚠️ O modo editor é uma ferramenta de bastidor, mas o código dele vai junto
+no deploy. Ele não aparece sozinho — só com o atalho ou o triplo clique.
+
 ## Textura do pergaminho
 
 A tela de título (capa) usa uma textura de pergaminho feita 100% em CSS por

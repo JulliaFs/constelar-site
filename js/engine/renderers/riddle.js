@@ -297,6 +297,7 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
   function showCartaStage() {
     stage.innerHTML = '';
     const carta = buildCarta({
+      chapter,
       titulo: chapter.reveal.title,
       paragraphs: chapter.reveal.paragraphs,
       closeLabel: chapter.reveal.continueLabel,

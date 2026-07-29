@@ -210,6 +210,7 @@ export function renderAstrolabe(appRoot, chapter, resume, { onSolved, onSealBrok
   function showCartaStage() {
     stage.innerHTML = '';
     const carta = buildCarta({
+      chapter,
       titulo: chapter.reveal.title,
       paragraphs: chapter.reveal.paragraphs,
       closeLabel: chapter.reveal.continueLabel,

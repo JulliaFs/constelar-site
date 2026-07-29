@@ -14,6 +14,7 @@ import { renderCollectibleBar } from './components/collectible-bar.js';
 import { playPageTurn } from './transitions/page-turn.js';
 import { playStarZoom } from './transitions/star-zoom.js';
 import { playFinale } from './transitions/finale.js';
+import { initEditMode } from './edit-mode.js';
 
 const RENDERERS = {
   narrative: renderNarrative,
@@ -41,6 +42,10 @@ export class BookEngine {
   }
 
   async init() {
+    // Modo editor (só para quem escreve o presente): fica desligado por
+    // padrão e não acrescenta nada ao DOM enquanto estiver assim.
+    initEditMode();
+
     this._ensureCollectibleBar();
     this._ensureHomeButton();
     const state = getState(CHAPTER_IDS[0] ?? null);

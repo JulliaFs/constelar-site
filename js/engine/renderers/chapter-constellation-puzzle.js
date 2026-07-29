@@ -335,6 +335,7 @@ export function renderConstellationPuzzle(appRoot, chapter, resume, { onSolved, 
   function showCartaStage() {
     stage.innerHTML = '';
     const carta = buildCarta({
+      chapter,
       titulo: chapter.reveal.title,
       paragraphs: chapter.reveal.paragraphs,
       closeLabel: chapter.reveal.continueLabel,
