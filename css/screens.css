@@ -152,6 +152,54 @@
 }
 
 /* ============================================================
+   CENA DO ALTAR (capítulo 2) — tela cheia, sem moldura de página.
+   Penumbra com um foco de luz vindo de baixo, como um monumento
+   iluminado no escuro. O altar em si vive em components.css (.altar*).
+   ============================================================ */
+
+.tela-altar {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  overflow: hidden;
+}
+
+/* Iluminação de cena: aura dourada subindo do chão + penumbra nas bordas. */
+.tela-altar__luz {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 34% at 50% 82%, rgba(240, 200, 105, .2) 0%, rgba(212, 175, 55, .07) 42%, transparent 68%),
+    radial-gradient(ellipse 70% 60% at 50% 46%, rgba(18, 25, 41, .5) 0%, transparent 70%),
+    radial-gradient(ellipse 96% 88% at 50% 50%, transparent 30%, rgba(3, 5, 12, .82) 88%);
+}
+
+.tela-altar__palco {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---- telas em tela cheia: entrada e saída próprias ----
+   (sem .pagina__conteudo, o virar-página não teria o que animar) */
+
+.tela-cheia.is-virando {
+  animation: telaCheiaSai var(--dur-cena) var(--mov-suave) forwards;
+}
+
+@keyframes telaCheiaSai {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(.965); }
+}
+
+/* ============================================================
    NARRATIVE
    ============================================================ */
 

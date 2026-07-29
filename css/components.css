@@ -748,221 +748,257 @@ a { color: var(--cor-ouro-300); }
 }
 
 /* ============================================================
-   PEDESTAL — apresentação 'pedestal' do riddle (capítulo 2).
-   Altar alquímico: pedra escura com filigrana dourada, a charada
-   gravada em luz, e fissuras douradas que correm pela pedra no acerto.
+   ALTAR — apresentação 'pedestal' do riddle (capítulo 2).
+   Monumento único: coroa com o nome do capítulo, tábua de pedra com o
+   enigma esculpido, e a placa de latão entalhada na base. Sem moldura
+   de página e sem formulário empilhado — a cena É a tela.
    ============================================================ */
 
-.pedestal {
+.altar {
   position: relative;
+  width: min(560px, 92vw);
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: min(340px, 82%);
-  margin: var(--esp-2) auto var(--esp-3);
+  /* 2.5D: o monumento é visto de levemente acima. */
+  transform: perspective(1400px) rotateX(3deg);
+  transform-style: preserve-3d;
+  animation: altarSurge var(--dur-ritual) var(--mov-entrada) both;
 }
 
-/* ---- face gravada ---- */
+@keyframes altarSurge {
+  from { opacity: 0; transform: perspective(1400px) rotateX(3deg) translateY(22px) scale(.98); }
+  to   { opacity: 1; transform: perspective(1400px) rotateX(3deg) translateY(0) scale(1); }
+}
 
-.pedestal__face {
+/* ---- coroa: o nome gravado no alto do monumento ---- */
+
+.altar__coroa {
+  position: relative;
+  width: 92%;
+  padding-bottom: var(--esp-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.altar__coroa-ornamento {
+  width: 100%;
+  height: 34px;
+  overflow: visible;
+}
+.altar__coroa-ornamento path {
+  fill: none;
+  stroke: var(--cor-ouro-600);
+  stroke-width: 1;
+  stroke-opacity: .7;
+  vector-effect: non-scaling-stroke;
+}
+.altar__coroa-ornamento .altar__coroa-arco {
+  stroke: var(--cor-ouro-300);
+  stroke-opacity: .95;
+  stroke-width: 1.4;
+}
+.altar__coroa-ornamento .altar__coroa-losango {
+  fill: var(--cor-ouro-500);
+  stroke: none;
+}
+
+.altar__nome {
+  margin-top: -6px;
+  font-family: var(--fonte-exib);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--cor-ouro-300);
+  text-shadow: 0 0 18px rgba(212, 175, 55, .45), 0 1px 0 rgba(0, 0, 0, .8);
+}
+
+/* ---- tábua de pedra ---- */
+
+.altar__tabua {
   position: relative;
   width: 100%;
-  min-height: 118px;
+  padding: var(--esp-5) var(--esp-5) var(--esp-4);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--esp-4) var(--esp-4);
-  background:
-    linear-gradient(158deg, rgba(255, 255, 255, .045) 0%, transparent 42%),
-    linear-gradient(180deg, #2A2C33 0%, #191A20 55%, #101116 100%);
+  gap: var(--esp-4);
+  background: linear-gradient(180deg, #121929 0%, #080c14 100%);
+  border: 1px solid rgba(212, 175, 55, .42);
   box-shadow:
-    0 20px 38px -16px rgba(0, 0, 0, .8),
-    inset 0 1px 0 rgba(255, 240, 202, .12),
-    inset 0 -10px 24px rgba(0, 0, 0, .55);
+    0 40px 70px -26px rgba(0, 0, 0, .9),
+    inset 0 1px 0 rgba(255, 240, 202, .16),
+    inset 0 -24px 46px rgba(0, 0, 0, .6);
 }
 
-/* Veios do mármore, em traço bem apagado. */
-.pedestal__face::after {
+/* Fio de ouro interno + veios da pedra. */
+.altar__tabua::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(212, 175, 55, .18);
+  pointer-events: none;
+}
+.altar__tabua::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: .5;
+  opacity: .55;
   background:
-    linear-gradient(114deg, transparent 28%, rgba(255, 240, 202, .05) 29%, transparent 31%),
-    linear-gradient(72deg, transparent 58%, rgba(255, 240, 202, .04) 59%, transparent 61%),
-    linear-gradient(96deg, transparent 74%, rgba(255, 240, 202, .03) 75%, transparent 77%);
+    linear-gradient(112deg, transparent 26%, rgba(255, 240, 202, .05) 27%, transparent 29%),
+    linear-gradient(68deg, transparent 55%, rgba(255, 240, 202, .04) 56%, transparent 58%),
+    linear-gradient(94deg, transparent 76%, rgba(255, 240, 202, .03) 77%, transparent 79%);
 }
 
-.pedestal__filigrana {
-  position: absolute;
-  inset: 6px;
-  width: auto;
-  height: auto;
-  pointer-events: none;
-}
-.pedestal__filigrana path {
-  fill: none;
-  stroke: var(--cor-ouro-600);
-  stroke-width: 1;
-  stroke-opacity: .75;
-  vector-effect: non-scaling-stroke;
-}
-.pedestal__filigrana .pedestal__filigrana--fina {
-  stroke-opacity: .3;
-}
-.pedestal__filigrana .pedestal__volta {
-  stroke: var(--cor-ouro-300);
-  stroke-opacity: .9;
-  stroke-width: 1.4;
-}
-
-/* A charada, gravada em luz. */
-.pedestal__gravura {
+.altar__preambulo {
   position: relative;
   z-index: 1;
   font-family: var(--fonte-exib);
   font-style: italic;
   font-weight: 300;
-  font-size: clamp(1.05rem, 2.3vw, 1.42rem);
-  line-height: 1.55;
+  font-size: clamp(.9rem, 1.9vw, 1.02rem);
+  line-height: 1.6;
+  text-align: center;
+  color: var(--cor-pergaminho-50);
+  max-width: 46ch;
+}
+
+/* O enigma, esculpido e aceso por dentro da pedra. */
+.altar__inscricao {
+  position: relative;
+  z-index: 1;
+  font-family: var(--fonte-exib);
+  font-weight: 300;
+  font-size: clamp(1.25rem, 3vw, 1.72rem);
+  line-height: 1.5;
+  letter-spacing: .015em;
   text-align: center;
   color: #FFF0CA;
   text-shadow:
-    0 0 14px rgba(240, 200, 105, .5),
-    0 1px 0 rgba(0, 0, 0, .8);
+    0 0 12px rgba(212, 175, 55, .6),
+    0 1px 0 rgba(0, 0, 0, .85);
+  max-width: 34ch;
 }
 
-/* ---- base de pedra ---- */
+/* ---- placa de latão entalhada na base da pedra ---- */
 
-.pedestal__base {
+.altar__placa {
   position: relative;
-  width: 78%;
-  height: 74px;
-  clip-path: polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%);
-  background: linear-gradient(180deg, #23252B 0%, #16171C 60%, #0D0E12 100%);
-  border-top: 2px solid rgba(212, 175, 55, .35);
-  box-shadow: 0 26px 40px -18px rgba(0, 0, 0, .75);
-}
-
-.pedestal__base-veio {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: linear-gradient(180deg, rgba(255, 240, 202, .09), transparent 70%);
-}
-.pedestal__base-veio:nth-child(1) { left: 38%; }
-.pedestal__base-veio:nth-child(2) { left: 63%; }
-
-/* ---- fissuras douradas (acerto) ---- */
-
-.pedestal__fissuras {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-  opacity: 0;
-}
-
-.pedestal__fissuras path {
-  fill: none;
-  stroke: #FFF0CA;
-  stroke-width: 1.4;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 7px #D4AF37);
-  stroke-dasharray: 260;
-  stroke-dashoffset: 260;
-}
-
-.pedestal.is-iluminado .pedestal__fissuras { opacity: 1; }
-.pedestal.is-iluminado .pedestal__fissuras path {
-  animation: golden-fissure 1000ms var(--mov-suave) forwards;
-}
-.pedestal.is-iluminado .pedestal__fissuras path:nth-child(2) { animation-delay: 70ms; }
-.pedestal.is-iluminado .pedestal__fissuras path:nth-child(3) { animation-delay: 130ms; }
-.pedestal.is-iluminado .pedestal__fissuras path:nth-child(4) { animation-delay: 220ms; }
-.pedestal.is-iluminado .pedestal__fissuras path:nth-child(5) { animation-delay: 280ms; }
-
-@keyframes golden-fissure {
-  0%   { stroke-dashoffset: 260; opacity: 0; }
-  25%  { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 1; }
-}
-
-/* A pedra inteira acende junto. */
-.pedestal.is-iluminado .pedestal__face,
-.pedestal.is-iluminado .pedestal__base {
-  animation: pedraAcende 1000ms var(--mov-suave) forwards;
-}
-
-@keyframes pedraAcende {
-  0%   { filter: brightness(1); }
-  45%  { filter: brightness(1.5) drop-shadow(0 0 26px rgba(240, 200, 105, .55)); }
-  100% { filter: brightness(1.16) drop-shadow(0 0 16px rgba(240, 200, 105, .35)); }
-}
-
-/* ============================================================
-   CAMPO DO PEDESTAL — placa de latão encravada na pedra.
-   Escopo só na apresentação 'pedestal' para não alterar as outras.
-   ============================================================ */
-
-.tela-enigma__corpo--pedestal .enigma-campo__linha {
-  padding: 12px 18px;
-  background: rgba(5, 8, 17, .7);
-  border: 1px solid var(--cor-ouro-500);
-  /* Segunda linha de ouro, por dentro. */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: min(400px, 100%);
+  padding: 9px 10px 9px var(--esp-4);
+  background: linear-gradient(180deg, rgba(4, 6, 13, .92) 0%, rgba(8, 12, 22, .72) 100%);
+  border-top: 1px solid rgba(212, 175, 55, .5);
+  border-bottom: 1px solid rgba(212, 175, 55, .22);
+  /* Sombra interna forte = fenda cavada na pedra. */
   box-shadow:
-    inset 0 0 0 1px rgba(212, 175, 55, .28),
-    inset 0 2px 10px rgba(0, 0, 0, .6),
-    0 10px 22px -12px rgba(0, 0, 0, .8);
-  transition: box-shadow var(--dur-padrao) var(--mov-suave), border-color var(--dur-padrao) var(--mov-suave);
+    inset 0 8px 16px rgba(0, 0, 0, .9),
+    inset 0 -1px 0 rgba(255, 240, 202, .1),
+    0 1px 0 rgba(255, 240, 202, .06);
+  transition: box-shadow var(--dur-padrao) var(--mov-suave);
 }
 
-.tela-enigma__corpo--pedestal .enigma-campo__linha:focus-within {
-  border-color: var(--cor-ouro-300);
+.altar__placa:focus-within {
   box-shadow:
-    inset 0 0 0 1px rgba(240, 200, 105, .5),
-    inset 0 2px 10px rgba(0, 0, 0, .6),
-    0 0 26px rgba(240, 200, 105, .35);
+    inset 0 8px 16px rgba(0, 0, 0, .9),
+    inset 0 -1px 0 rgba(255, 240, 202, .1),
+    0 0 26px rgba(240, 200, 105, .34);
 }
 
-.tela-enigma__corpo--pedestal .enigma-input {
+/* Rebites de latão nas pontas da placa. */
+.altar__placa-rebite {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #F0C869, #8A6D3B);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .8);
+}
+
+.altar__entrada {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
   font-family: var(--fonte-texto);
   font-weight: 400;
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: .15em;
   color: #FFF0CA;
+  caret-color: var(--cor-ouro-300);
+}
+.altar__entrada::placeholder {
+  color: rgba(245, 239, 224, .28);
+  letter-spacing: .1em;
+  text-transform: none;
+  font-style: italic;
 }
 
-/* A placa já tem borda; a régua do visual padrão sai de cena. */
-.tela-enigma__corpo--pedestal .enigma-regua { display: none; }
-
-.tela-enigma__corpo--pedestal .enigma-enviar { margin-top: var(--esp-3); }
-
-/* ---- feedback: caixa poética, sem efeito de erro de sistema ---- */
-
-.tela-enigma__corpo--pedestal .enigma-status {
-  min-height: 58px;
-  margin-top: var(--esp-3);
+/* Botão-selo de filigrana, acoplado à própria placa. */
+.altar__selo {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 240, 202, .45);
+  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 44%, #8A6D3B 100%);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 245, 220, .55);
+  cursor: pointer;
+  transition: box-shadow var(--dur-rapido) var(--mov-suave), transform var(--dur-rapido) var(--mov-suave);
+}
+.altar__selo .fagulha {
+  width: 14px;
+  height: 14px;
+  background: #2A1E06;
+}
+.altar__selo:hover,
+.altar__selo:focus-visible {
+  transform: scale(1.08);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 245, 220, .55), 0 0 20px rgba(240, 200, 105, .75);
+  outline: none;
+}
+.altar__selo:disabled {
+  opacity: .5;
+  cursor: default;
+  transform: none;
 }
 
-/* Nada de tremor nesta apresentação. */
-.tela-enigma__corpo--pedestal .enigma-campo.is-erro .enigma-campo__linha {
-  animation: none;
+/* ---- feedback: sussurro poético, sem efeito de erro de sistema ---- */
+
+.altar__status {
+  position: relative;
+  width: 100%;
+  min-height: 54px;
+  z-index: 1;
 }
 
-.tela-enigma__corpo--pedestal .enigma-campo.is-erro .enigma-status__msg--hint {
+.altar__placa.is-erro {
+  animation: none; /* nada de tremor nesta cena */
+}
+
+.altar__status .enigma-status__msg--hint {
   font-family: var(--fonte-exib);
   font-style: italic;
   font-size: 1rem;
   line-height: 1.5;
   color: var(--cor-pergaminho-60);
-  padding: 10px 20px;
+}
+
+.altar__placa.is-erro ~ .altar__status .enigma-status__msg--hint {
+  padding: 9px 18px;
   border-top: 1px solid rgba(212, 175, 55, .22);
   border-bottom: 1px solid rgba(212, 175, 55, .22);
   animation: mensagemSurge var(--dur-cena) var(--mov-entrada);
@@ -973,6 +1009,82 @@ a { color: var(--cor-ouro-300); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ---- base / plinto (2.5D) ---- */
+
+.altar__base {
+  position: relative;
+  width: 74%;
+  height: 58px;
+  clip-path: polygon(9% 0%, 91% 0%, 100% 100%, 0% 100%);
+  background: linear-gradient(180deg, #161D2E 0%, #0B1120 55%, #05080F 100%);
+  box-shadow: 0 34px 46px -22px rgba(0, 0, 0, .85);
+}
+
+/* Face superior do plinto, pegando a luz. */
+.altar__base-topo {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 7px;
+  background: linear-gradient(180deg, rgba(255, 240, 202, .22), rgba(255, 240, 202, .02));
+  border-top: 1px solid rgba(212, 175, 55, .4);
+}
+
+/* ---- fissuras douradas (acerto) ---- */
+
+.altar__fissuras {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  z-index: 2;
+}
+
+.altar__fissuras path {
+  fill: none;
+  stroke: #FFF0CA;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 7px #D4AF37);
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+}
+
+.altar.is-iluminado .altar__fissuras { opacity: 1; }
+.altar.is-iluminado .altar__fissuras path {
+  animation: golden-fissure 1000ms var(--mov-suave) forwards;
+}
+.altar.is-iluminado .altar__fissuras path:nth-child(2) { animation-delay: 70ms; }
+.altar.is-iluminado .altar__fissuras path:nth-child(3) { animation-delay: 130ms; }
+.altar.is-iluminado .altar__fissuras path:nth-child(4) { animation-delay: 220ms; }
+.altar.is-iluminado .altar__fissuras path:nth-child(5) { animation-delay: 280ms; }
+
+@keyframes golden-fissure {
+  0%   { stroke-dashoffset: 300; opacity: 0; }
+  25%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+/* A pedra inteira acende junto. */
+.altar.is-iluminado .altar__tabua,
+.altar.is-iluminado .altar__base {
+  animation: pedraAcende 1000ms var(--mov-suave) forwards;
+}
+
+@keyframes pedraAcende {
+  0%   { filter: brightness(1); }
+  45%  { filter: brightness(1.45) drop-shadow(0 0 28px rgba(240, 200, 105, .55)); }
+  100% { filter: brightness(1.15) drop-shadow(0 0 16px rgba(240, 200, 105, .32)); }
+}
+
+@media (max-width: 640px) {
+  .altar__tabua { padding: var(--esp-4) var(--esp-3) var(--esp-3); }
+  .altar__nome { font-size: 1rem; letter-spacing: .08em; }
+  .altar__base { height: 42px; }
+}
 /* ============================================================
    RUNES — riddle presentation 'runes' (chapter 4): a stone tablet
    with the message in real Elder Futhark Unicode, plus an

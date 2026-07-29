@@ -10,12 +10,14 @@ export default {
 
   riddle: {
     presentation: 'pedestal',
-    prompt: '[CHARADA PLACEHOLDER]',
+    // TROQUE por uma charada sua — e regenere o answerPayload abaixo com
+    // a resposta nova (node scripts/generate-answer.mjs "resposta").
+    prompt: 'Acompanho todo viajante, mas nunca chego antes dele. Sigo seus passos ao sol e desapareço quando a luz se apaga. Quem sou?',
     inputLabel: 'Sua resposta',       // opcional
-    placeholder: 'Digite aqui...',    // opcional
-    submitLabel: 'Confirmar',         // opcional
-    // Gerado com: node scripts/generate-answer.mjs "Resposta"
-    answerPayload: 'aHt6dnd6bHk=',
+    placeholder: 'a resposta...',     // opcional
+    submitLabel: 'Decifrar',          // opcional
+    // Gerado com: node scripts/generate-answer.mjs "sombra"
+    answerPayload: 'aHlpdHZ6',
     maxTypoDistance: 2,
     gentleRetryMessages: [
       'As estrelas permanecem em silêncio...',
