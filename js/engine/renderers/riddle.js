@@ -27,14 +27,38 @@ const PRESENTATIONS = {
     return frag;
   },
 
+  // Altar alquímico: pedra escura com filigrana dourada e a charada
+  // gravada em luz. `data-cena` marca o elemento que recebe a animação
+  // de acerto (as fissuras douradas).
   pedestal(chapter) {
     const frag = document.createElement('div');
-    frag.className = 'pedestal-cena';
+    frag.className = 'pedestal';
+    frag.dataset.cena = '';
     frag.innerHTML = `
-      <div class="pedestal-pergaminho">
-        <p class="pedestal-pergaminho__texto">${chapter.riddle.prompt}</p>
+      <div class="pedestal__face">
+        <svg class="pedestal__filigrana" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M8 8 H292 V112 H8 Z" />
+          <path d="M14 14 H286 V106 H14 Z" class="pedestal__filigrana--fina" />
+          <path d="M8 26 Q 22 8, 40 8" class="pedestal__volta" />
+          <path d="M292 26 Q 278 8, 260 8" class="pedestal__volta" />
+          <path d="M8 94 Q 22 112, 40 112" class="pedestal__volta" />
+          <path d="M292 94 Q 278 112, 260 112" class="pedestal__volta" />
+        </svg>
+        <p class="pedestal__gravura">${chapter.riddle.prompt}</p>
       </div>
-      <div class="pedestal-corpo"></div>
+
+      <div class="pedestal__base">
+        <span class="pedestal__base-veio"></span>
+        <span class="pedestal__base-veio"></span>
+      </div>
+
+      <svg class="pedestal__fissuras" viewBox="0 0 300 220" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M150 60 L120 96 L134 132 L104 178" />
+        <path d="M150 60 L184 92 L168 130 L196 176" />
+        <path d="M150 60 L150 104 L138 150 L152 200" />
+        <path d="M120 96 L74 108" />
+        <path d="M184 92 L232 106" />
+      </svg>
     `;
     return frag;
   },
@@ -106,8 +130,12 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
     contentEl.appendChild(intro);
   }
 
+  const apresentacao = chapter.riddle.presentation || 'plain';
+
   const stage = document.createElement('div');
-  stage.className = 'tela-enigma__corpo';
+  // O modificador deixa cada apresentação estilizar o campo e o feedback
+  // sem que uma interfira na outra.
+  stage.className = `tela-enigma__corpo tela-enigma__corpo--${apresentacao}`;
   contentEl.appendChild(stage);
 
   const validate = createAnswerValidator(chapter.riddle.answerPayload, chapter.riddle.maxTypoDistance ?? 2);
@@ -115,7 +143,7 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
   function showRiddleStage() {
     stage.innerHTML = '';
 
-    const decorate = PRESENTATIONS[chapter.riddle.presentation || 'plain'] || PRESENTATIONS.plain;
+    const decorate = PRESENTATIONS[apresentacao] || PRESENTATIONS.plain;
     stage.appendChild(decorate(chapter));
 
     const campo = document.createElement('div');
@@ -129,6 +157,9 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
           <span class="enigma-campo__ponta"></span>
         </div>
         <div class="enigma-regua"></div>
+        <button type="submit" class="btn-cta btn-cta--nouveau enigma-enviar">
+          <span class="fagulha"></span><span>${chapter.riddle.submitLabel || 'Decifrar'}</span>
+        </button>
         <div class="enigma-status">
           <span class="enigma-status__msg enigma-status__msg--hint visivel">Enter para confirmar</span>
         </div>
@@ -143,8 +174,7 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
     const retryMessages = chapter.riddle.gentleRetryMessages || ['Ainda não é essa. Tente novamente.'];
     let retryIndex = 0;
 
-    // The form has no visible submit button (by design), so Chrome won't
-    // implicitly submit on Enter in a lone text field — trigger it manually.
+    // Enter dispara o mesmo caminho do botão, sem envio implícito duplicado.
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -165,8 +195,15 @@ export function renderRiddle(appRoot, chapter, resume, { onSolved, onSealBroken,
         ok.textContent = 'É isso.';
         statusEl.appendChild(ok);
         input.disabled = true;
+        campo.querySelector('.enigma-enviar')?.setAttribute('disabled', '');
+
+        // A cena da apresentação (quando existe) toca sua própria
+        // animação de acerto — no pedestal, as fissuras douradas.
+        const cena = stage.querySelector('[data-cena]');
+        cena?.classList.add('is-iluminado');
+
         onSolved?.();
-        setTimeout(() => showSolvedStage({ freshlySolved: true }), 700);
+        setTimeout(() => showSolvedStage({ freshlySolved: true }), cena ? 1000 : 700);
         return;
       }
 
