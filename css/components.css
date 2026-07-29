@@ -9,13 +9,10 @@
 
 html, body {
   height: 100%;
-  /* Céu profundo global: azul-noite no centro, preto estelar nas bordas.
-     Fica no <body> (abaixo da camada de partículas) para o mapa celeste
-     poder ser totalmente transparente e deixar a poeira estelar aparecer. */
-  background:
-    radial-gradient(ellipse 120% 100% at 50% 42%, #0B1120 0%, #070B14 55%, #03050C 100%)
-    var(--cor-noite-900);
-  background-attachment: fixed;
+  /* Cor de segurança apenas. A cena de céu iluminada — gradiente base,
+     nebulosas e campo de estrelas — é montada em screens.css, que carrega
+     depois desta folha. */
+  background-color: var(--cor-noite-900);
   color: var(--cor-pergaminho);
   font-family: var(--fonte-texto);
   overflow-x: hidden;
@@ -30,11 +27,14 @@ body {
 }
 
 ::selection {
-  background: rgba(240, 200, 105, .3);
-  color: var(--cor-pergaminho);
+  background: rgba(226, 192, 117, .34);
+  color: var(--cor-ouro-brilhante);
 }
 
-a { color: var(--cor-ouro-300); }
+a {
+  color: var(--cor-ouro-300);
+  text-shadow: var(--luz-texto);
+}
 
 #tsparticles-layer {
   position: fixed;
@@ -65,13 +65,15 @@ a { color: var(--cor-ouro-300); }
   display: inline-block;
   width: 10px;
   height: 10px;
-  background: var(--cor-ouro-300);
+  background: var(--cor-ouro-brilhante);
   clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
   flex-shrink: 0;
+  filter: var(--bloom-ouro);
 }
 
 .fagulha--estelar {
-  background: var(--cor-estelar);
+  background: var(--cor-estrela-branca);
+  filter: var(--bloom-estrela);
 }
 
 .glifo-sol {
@@ -80,8 +82,9 @@ a { color: var(--cor-ouro-300); }
   height: 14px;
   border-radius: 50%;
   background:
-    radial-gradient(circle, var(--cor-ouro-300) 35%, transparent 36%),
+    radial-gradient(circle, var(--cor-ouro-brilhante) 35%, transparent 36%),
     repeating-conic-gradient(from 0deg, var(--cor-ouro-300) 0deg 3deg, transparent 3deg 30deg);
+  filter: var(--bloom-ouro);
 }
 
 .glifo-lua {
@@ -90,7 +93,7 @@ a { color: var(--cor-ouro-300); }
   height: 14px;
   border-radius: 50%;
   background: var(--cor-ouro-300);
-  box-shadow: inset 4px -2px 0 0 var(--cor-noite-800);
+  box-shadow: inset 4px -2px 0 0 var(--cor-noite-800), var(--brilho-p);
 }
 
 /* Main emblem — recolored via mask so the source SVG (a black silhouette)
@@ -99,7 +102,11 @@ a { color: var(--cor-ouro-300); }
   display: inline-block;
   width: 132px;
   height: 132px;
-  background: var(--cor-ouro-500);
+  background:
+    radial-gradient(circle at 42% 34%,
+      var(--cor-ouro-brilhante) 0%,
+      var(--cor-ouro-principal) 52%,
+      var(--cor-ouro-sombra) 100%);
   -webkit-mask-image: url('../assets/brand/emblema.svg');
   mask-image: url('../assets/brand/emblema.svg');
   -webkit-mask-repeat: no-repeat;
@@ -108,21 +115,26 @@ a { color: var(--cor-ouro-300); }
   mask-position: center;
   -webkit-mask-size: contain;
   mask-size: contain;
-  filter: drop-shadow(0 0 22px rgba(240, 200, 105, .35));
+  filter: var(--bloom-ouro-forte);
 }
 
 /* ============================================================
    PAGE SHELL — the "page" container reused by every screen
    ============================================================ */
 
+/* Vidro de safira: o céu global atravessa a página e a moldura vira uma
+   filigrana dourada iluminada, em vez de uma caixa opaca.
+   O `backdrop-filter` NÃO pode morar aqui: como propriedade de agrupamento,
+   ele anularia o `transform-style: preserve-3d` de que o virar-página
+   depende. Quem carrega o desfoque é .pagina__ceu, que fica fora do 3D. */
 .pagina {
   position: relative;
   width: min(1200px, 92vw);
   aspect-ratio: 1200 / 740;
   max-height: 88vh;
-  background: var(--cor-noite-800);
-  border: 1px solid rgba(201, 162, 39, .24);
-  box-shadow: var(--sombra-abobada);
+  background: transparent;
+  border: 1px solid var(--vidro-borda);
+  box-shadow: var(--sombra-abobada), var(--vidro-sombra);
   overflow: hidden;
   transform-style: preserve-3d;
   perspective: 2400px;
@@ -133,15 +145,22 @@ a { color: var(--cor-ouro-300); }
   inset: 0;
   background:
     radial-gradient(closest-side at var(--ceu-x, 50%) var(--ceu-y, 46%),
-      var(--cor-noite-700) 0%, var(--cor-noite-800) 58%, var(--cor-noite-900) 100%);
+      rgba(22, 40, 70, .78) 0%,
+      rgba(16, 27, 51, .72) 46%,
+      rgba(4, 7, 17, .8) 100%);
+  backdrop-filter: var(--vidro-desfoque) saturate(1.15);
+  -webkit-backdrop-filter: var(--vidro-desfoque) saturate(1.15);
   z-index: 0;
 }
 
 .pagina__nebulosa {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 40% at 30% 70%, var(--cor-veludo) 0%, transparent 70%);
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 70%, var(--cor-nebula-violeta) 0%, transparent 72%),
+    radial-gradient(ellipse 48% 36% at 74% 28%, var(--cor-nebula-ciano) 0%, transparent 74%);
   opacity: var(--nebulosa-opacidade, 0);
+  filter: blur(28px);
   z-index: 0;
   pointer-events: none;
 }
@@ -151,23 +170,43 @@ a { color: var(--cor-ouro-300); }
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Mesmas três temperaturas do campo global: branco puro, creme e azul
+     estelar — cada estrela com seu próprio halo. */
   background-image:
-    radial-gradient(1.4px 1.4px at 10% 20%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1px 1px at 30% 65%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1.6px 1.6px at 55% 15%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1px 1px at 72% 80%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1.2px 1.2px at 85% 35%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1px 1px at 95% 60%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1.3px 1.3px at 20% 90%, var(--cor-estelar) 0, transparent 100%),
-    radial-gradient(1px 1px at 45% 45%, var(--cor-estelar) 0, transparent 100%);
-  opacity: .55;
+    radial-gradient(2.4px 2.4px at 10% 20%, var(--cor-estrela-azul) 0, transparent 100%),
+    radial-gradient(12px 12px at 10% 20%, rgba(169, 199, 255, .16) 0, transparent 100%),
+    radial-gradient(1px 1px at 30% 65%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(2.4px 2.4px at 55% 15%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(12px 12px at 55% 15%, rgba(255, 255, 255, .14) 0, transparent 100%),
+    radial-gradient(1px 1px at 72% 80%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(1.7px 1.7px at 85% 35%, var(--cor-estrela-creme) 0, transparent 100%),
+    radial-gradient(8px 8px at 85% 35%, rgba(255, 241, 206, .16) 0, transparent 100%),
+    radial-gradient(1px 1px at 95% 60%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(1.7px 1.7px at 20% 90%, var(--cor-estrela-creme) 0, transparent 100%),
+    radial-gradient(8px 8px at 20% 90%, rgba(255, 241, 206, .16) 0, transparent 100%),
+    radial-gradient(1px 1px at 45% 45%, var(--cor-estrela-branca) 0, transparent 100%);
+  opacity: .7;
+  animation: estrelaPisca 6.8s ease-in-out infinite;
 }
 
+/* Moldura dupla: um fio externo vivo e um interno quase apagado. */
 .pagina__moldura {
   position: absolute;
   inset: var(--moldura);
-  border: 1px solid rgba(201, 162, 39, .1);
+  border: 1px solid rgba(226, 192, 117, .3);
+  box-shadow:
+    inset 0 0 0 1px rgba(226, 192, 117, .06),
+    inset 0 0 34px rgba(226, 192, 117, .05),
+    0 0 22px rgba(226, 192, 117, .08);
   z-index: 1;
+  pointer-events: none;
+}
+
+.pagina__moldura::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(226, 192, 117, .12);
   pointer-events: none;
 }
 
@@ -194,26 +233,28 @@ a { color: var(--cor-ouro-300); }
   height: 64px;
   z-index: 3;
   pointer-events: none;
+  filter: var(--bloom-ouro);
 }
 .pagina__canto::before {
   content: '';
   position: absolute;
   top: 0; left: 0;
   width: 46px; height: 1px;
-  background: linear-gradient(90deg, rgba(201,162,39,.6), transparent);
+  background: linear-gradient(90deg, var(--cor-ouro-brilhante), transparent);
 }
 .pagina__canto::after {
   content: '';
   position: absolute;
   top: 0; left: 0;
   width: 1px; height: 34px;
-  background: linear-gradient(180deg, rgba(201,162,39,.6), transparent);
+  background: linear-gradient(180deg, var(--cor-ouro-brilhante), transparent);
 }
 .pagina__canto span {
   position: absolute;
   top: 12px; left: 12px;
   width: 6px; height: 6px;
-  border: 1px solid var(--cor-ouro-600);
+  border: 1px solid var(--cor-ouro-principal);
+  background: rgba(255, 245, 214, .18);
   transform: rotate(45deg);
 }
 
@@ -232,7 +273,8 @@ a { color: var(--cor-ouro-300); }
   font-size: .72rem;
   letter-spacing: .28em;
   text-transform: uppercase;
-  color: var(--cor-pergaminho-50);
+  color: var(--cor-pergaminho-60);
+  text-shadow: 0 0 12px rgba(255, 240, 202, .3);
 }
 
 .txt-capitulo {
@@ -241,7 +283,26 @@ a { color: var(--cor-ouro-300); }
   font-size: clamp(1.8rem, 4vw, 3.2rem);
   line-height: 1.05;
   letter-spacing: -.01em;
-  color: var(--cor-pergaminho);
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto-forte);
+}
+
+/* Título iluminado: o texto vira um degradê de ouro que acende de cima
+   para baixo, com bloom real por trás dos glifos. Só entra onde o recorte
+   por texto existe — senão o fallback acima (ouro sólido) continua valendo,
+   e o título nunca corre o risco de ficar invisível. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .txt-capitulo {
+    background-image: linear-gradient(180deg,
+      var(--cor-ouro-brilhante) 0%,
+      #F7E5B4 46%,
+      var(--cor-ouro-principal) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: var(--bloom-ouro-forte);
+  }
 }
 
 .txt-enigma {
@@ -251,6 +312,7 @@ a { color: var(--cor-ouro-300); }
   font-size: clamp(1.3rem, 2.6vw, 1.9rem);
   line-height: 1.5;
   color: var(--cor-pergaminho);
+  text-shadow: var(--luz-texto);
   max-width: var(--coluna-texto);
 }
 
@@ -276,13 +338,16 @@ a { color: var(--cor-ouro-300); }
    ============================================================ */
 
 .btn-cta {
+  position: relative;
   appearance: none;
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid rgba(201, 162, 39, .4);
-  background: rgba(22, 28, 66, .38);
-  color: var(--cor-ouro-300);
+  border: 1px solid var(--vidro-borda);
+  background: var(--vidro-safira);
+  backdrop-filter: var(--vidro-desfoque);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  color: var(--cor-ouro-brilhante);
   cursor: pointer;
   padding: 16px 34px;
   border-radius: var(--raio);
@@ -291,22 +356,50 @@ a { color: var(--cor-ouro-300); }
   font-size: .78rem;
   letter-spacing: .3em;
   text-transform: uppercase;
+  text-shadow: var(--luz-texto);
+  box-shadow:
+    0 0 18px rgba(226, 192, 117, .14),
+    inset 0 1px 0 rgba(255, 245, 214, .14);
   transition: box-shadow var(--dur-padrao) var(--mov-suave),
               border-color var(--dur-padrao) var(--mov-suave),
+              text-shadow var(--dur-padrao) var(--mov-suave),
               background var(--dur-padrao) var(--mov-suave);
 }
 
-.btn-cta:hover {
-  box-shadow: 0 0 30px rgba(240, 200, 105, .3), inset 0 0 24px rgba(240, 200, 105, .08);
-  border-color: var(--cor-ouro-300);
+/* Fio interno de filigrana — a borda dupla do Art Nouveau.
+   A variante --nouveau usa esquadrias de canto no lugar deste fio. */
+.btn-cta:not(.btn-cta--nouveau)::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--vidro-borda-interna);
+  pointer-events: none;
+  transition: border-color var(--dur-padrao) var(--mov-suave);
+}
+
+.btn-cta:hover,
+.btn-cta:focus-visible {
+  outline: none;
+  border-color: var(--cor-ouro-brilhante);
+  background: rgba(22, 40, 70, .7);
+  box-shadow:
+    0 0 40px rgba(226, 192, 117, .45),
+    inset 0 0 26px rgba(226, 192, 117, .12),
+    inset 0 1px 0 rgba(255, 245, 214, .22);
+  text-shadow: var(--luz-texto-forte);
+}
+.btn-cta:not(.btn-cta--nouveau):hover::after,
+.btn-cta:not(.btn-cta--nouveau):focus-visible::after {
+  border-color: rgba(226, 192, 117, .5);
 }
 
 .btn-cta:active { transform: translateY(1px); }
 
 .btn-cta:disabled {
-  opacity: .35;
+  opacity: .32;
   cursor: not-allowed;
   box-shadow: none;
+  text-shadow: none;
 }
 
 /* ============================================================
@@ -357,16 +450,17 @@ a { color: var(--cor-ouro-300); }
   width: 100%;
   height: 1px;
   margin-top: 10px;
-  background: rgba(201, 162, 39, .42);
+  background: rgba(226, 192, 117, .5);
+  box-shadow: 0 0 10px rgba(226, 192, 117, .3);
   transition: background var(--dur-padrao) var(--mov-suave), box-shadow var(--dur-padrao) var(--mov-suave);
 }
 
 .enigma-campo.is-correto .enigma-input {
-  color: var(--cor-ouro-300);
-  text-shadow: 0 0 18px rgba(240, 200, 105, .5);
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto-forte);
 }
 .enigma-campo.is-correto .enigma-regua {
-  background: var(--cor-ouro-600);
+  background: var(--cor-ouro-brilhante);
   box-shadow: var(--brilho-m);
 }
 .enigma-campo.is-erro .enigma-regua {
@@ -395,15 +489,23 @@ a { color: var(--cor-ouro-300); }
 .enigma-status__msg.visivel { opacity: 1; }
 .enigma-status__msg--hint { color: var(--cor-pergaminho-50); }
 .enigma-status__msg--erro { color: var(--cor-cobre); }
-.enigma-status__msg--ok { color: var(--cor-ouro-300); }
+.enigma-status__msg--ok {
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto);
+}
 
-/* coordinate / hint lines */
+/* coordinate / hint lines — vidro de safira com fio tracejado de ouro */
 .enigma-pistas {
+  position: relative;
   font-family: var(--fonte-nota);
   font-size: .82rem;
   line-height: 1.9;
   color: var(--cor-pergaminho-60);
-  border: 1px dashed rgba(201, 162, 39, .3);
+  background: var(--vidro-safira);
+  backdrop-filter: var(--vidro-desfoque);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  border: 1px dashed rgba(226, 192, 117, .38);
+  box-shadow: var(--vidro-sombra);
   padding: 14px 20px;
   letter-spacing: .02em;
 }
@@ -440,7 +542,8 @@ a { color: var(--cor-ouro-300); }
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(190, 40, 60, .2) 0%, rgba(240, 200, 105, .12) 45%, transparent 72%);
+  background: radial-gradient(circle, rgba(190, 40, 60, .26) 0%, rgba(226, 192, 117, .22) 45%, transparent 74%);
+  filter: blur(6px);
   transition: opacity var(--dur-cena) var(--mov-suave);
 }
 .selo-wrap.is-quebrado .selo-halo { opacity: 0; }
@@ -456,7 +559,8 @@ a { color: var(--cor-ouro-300); }
   box-shadow:
     0 18px 34px -12px rgba(0, 0, 0, .75),
     inset 0 2px 0 rgba(255, 190, 190, .35),
-    inset 0 -10px 20px rgba(40, 6, 12, .7);
+    inset 0 -10px 20px rgba(40, 6, 12, .7),
+    0 0 24px rgba(226, 192, 117, .22);
   animation: seloRespira 5200ms ease-in-out infinite;
 }
 
@@ -466,8 +570,8 @@ a { color: var(--cor-ouro-300); }
   position: absolute;
   inset: 13px;
   border-radius: 50%;
-  border: 1px solid rgba(212, 175, 55, .35);
-  box-shadow: inset 0 1px 0 rgba(255, 210, 170, .22);
+  border: 1px solid rgba(226, 192, 117, .5);
+  box-shadow: inset 0 1px 0 rgba(255, 245, 214, .3), 0 0 10px rgba(226, 192, 117, .2);
 }
 
 .selo-emblema {
@@ -482,7 +586,8 @@ a { color: var(--cor-ouro-300); }
   fill: rgba(52, 8, 16, .62);
 }
 .selo-emblema__estrela {
-  fill: rgba(240, 200, 105, .55);
+  fill: rgba(255, 245, 214, .7);
+  filter: drop-shadow(0 0 5px rgba(226, 192, 117, .6));
 }
 
 .selo-metade--esq {
@@ -501,7 +606,7 @@ a { color: var(--cor-ouro-300); }
     0 18px 34px -12px rgba(0, 0, 0, .75),
     inset 0 2px 0 rgba(255, 190, 190, .35),
     inset 0 -10px 20px rgba(40, 6, 12, .7),
-    0 0 22px rgba(240, 200, 105, .55);
+    0 0 34px rgba(226, 192, 117, .75);
 }
 .selo-wrap:focus-visible { outline: none; }
 
@@ -599,8 +704,10 @@ a { color: var(--cor-ouro-300); }
   position: absolute;
   inset: 0;
   background: linear-gradient(155deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 70%);
-  border: 1px solid var(--cor-perg-sombra);
-  box-shadow: 0 14px 30px -10px rgba(0, 0, 0, .6), 0 0 20px rgba(240, 200, 105, .12);
+  border: 1px solid var(--cor-ouro-sombra);
+  box-shadow:
+    0 14px 30px -10px rgba(0, 0, 0, .6),
+    0 0 34px rgba(226, 192, 117, .35);
 }
 
 .carta-corpo::before {
@@ -616,8 +723,9 @@ a { color: var(--cor-ouro-300); }
   width: 22px; height: 22px;
   transform: translate(-50%, -50%);
   border-radius: 47% 53% 46% 54% / 52% 46% 54% 48%;
-  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 38%, #A8801F 72%, #7A5C15 100%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+  background: radial-gradient(circle at 34% 28%,
+    var(--cor-ouro-brilhante) 0%, var(--cor-ouro-principal) 40%, #A88B4C 74%, var(--cor-ouro-sombra) 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .5), 0 0 14px rgba(226, 192, 117, .55);
 }
 
 .carta-legenda {
@@ -644,11 +752,20 @@ a { color: var(--cor-ouro-300); }
   transform: rotateX(0deg);
 }
 
+/* A carta continua sendo papel — é o único objeto diegético de pergaminho
+   da cena, e tinta escura sobre creme é o que a torna legível. O que ela
+   ganha aqui é a luz ao redor: um halo dourado, como se a carta estivesse
+   sob o mesmo foco que ilumina o resto do céu. */
 .carta-aberta__pergaminho {
   position: relative;
-  background: linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
-  border: 1px solid var(--cor-perg-sombra);
-  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, .7);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255, 245, 214, .9) 0%, transparent 70%),
+    linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
+  border: 1px solid var(--cor-ouro-sombra);
+  box-shadow:
+    0 20px 50px -20px rgba(0, 0, 0, .7),
+    0 0 60px rgba(226, 192, 117, .3),
+    0 0 0 1px rgba(226, 192, 117, .18);
   color: var(--cor-perg-tinta);
   padding: var(--esp-5) var(--esp-6);
   max-width: min(var(--coluna-texto), 90%);
@@ -660,7 +777,8 @@ a { color: var(--cor-ouro-300); }
   content: '';
   position: absolute;
   inset: 9px;
-  border: 1px solid rgba(107, 78, 46, .3);
+  border: 1px solid rgba(138, 109, 59, .45);
+  box-shadow: inset 0 0 0 3px rgba(226, 192, 117, .12);
   pointer-events: none;
 }
 
@@ -668,7 +786,8 @@ a { color: var(--cor-ouro-300); }
   position: absolute;
   width: 14px;
   height: 14px;
-  border: 0 solid var(--cor-ouro-600);
+  border: 0 solid var(--cor-ouro-principal);
+  filter: drop-shadow(0 0 4px rgba(138, 109, 59, .5));
   pointer-events: none;
 }
 .carta-aberta__canto--tl { top: 4px; left: 4px; border-top-width: 2px; border-left-width: 2px; }
@@ -708,10 +827,10 @@ a { color: var(--cor-ouro-300); }
   line-height: .82;
   padding: .06em .12em 0 0;
   margin-right: .04em;
-  color: var(--cor-ouro-700);
+  color: var(--cor-ouro-sombra);
   text-shadow:
-    0 1px 0 rgba(255, 240, 202, .8),
-    0 0 14px rgba(212, 175, 55, .45);
+    0 1px 0 rgba(255, 245, 214, .9),
+    0 0 18px rgba(226, 192, 117, .7);
 }
 
 .carta-aberta__texto [data-linha] {
@@ -722,10 +841,12 @@ a { color: var(--cor-ouro-300); }
 
 /* ---- botão Art Nouveau (rodapé da carta) ---- */
 
+/* Variante de canto ornamentado: troca o fio interno de .btn-cta por
+   duas esquadrias de filigrana nos cantos opostos. */
 .btn-cta--nouveau {
   position: relative;
-  border-color: rgba(212, 175, 55, .6);
-  background: rgba(10, 15, 29, .55);
+  border-color: var(--vidro-borda);
+  background: var(--vidro-safira);
   padding: 15px 40px;
 }
 
@@ -733,9 +854,11 @@ a { color: var(--cor-ouro-300); }
 .btn-cta--nouveau::after {
   content: '';
   position: absolute;
+  inset: auto;
   width: 11px;
   height: 11px;
-  border: 0 solid var(--cor-ouro-500);
+  border: 0 solid var(--cor-ouro-brilhante);
+  filter: var(--bloom-ouro);
   pointer-events: none;
 }
 .btn-cta--nouveau::before {
@@ -787,20 +910,23 @@ a { color: var(--cor-ouro-300); }
   height: 34px;
   overflow: visible;
 }
+.altar__coroa-ornamento {
+  filter: var(--bloom-ouro);
+}
 .altar__coroa-ornamento path {
   fill: none;
-  stroke: var(--cor-ouro-600);
+  stroke: var(--cor-ouro-principal);
   stroke-width: 1;
-  stroke-opacity: .7;
+  stroke-opacity: .8;
   vector-effect: non-scaling-stroke;
 }
 .altar__coroa-ornamento .altar__coroa-arco {
-  stroke: var(--cor-ouro-300);
-  stroke-opacity: .95;
+  stroke: var(--cor-ouro-brilhante);
+  stroke-opacity: 1;
   stroke-width: 1.4;
 }
 .altar__coroa-ornamento .altar__coroa-losango {
-  fill: var(--cor-ouro-500);
+  fill: var(--cor-ouro-brilhante);
   stroke: none;
 }
 
@@ -812,8 +938,8 @@ a { color: var(--cor-ouro-300); }
   letter-spacing: .12em;
   text-transform: uppercase;
   text-align: center;
-  color: var(--cor-ouro-300);
-  text-shadow: 0 0 18px rgba(212, 175, 55, .45), 0 1px 0 rgba(0, 0, 0, .8);
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto-forte), 0 1px 0 rgba(0, 0, 0, .8);
 }
 
 /* ---- tábua de pedra ---- */
@@ -826,12 +952,16 @@ a { color: var(--cor-ouro-300); }
   flex-direction: column;
   align-items: center;
   gap: var(--esp-4);
-  background: linear-gradient(180deg, #121929 0%, #080c14 100%);
-  border: 1px solid rgba(212, 175, 55, .42);
+  /* Vidro de safira sobre a pedra: o céu iluminado atravessa a tábua. */
+  background: linear-gradient(180deg, rgba(22, 40, 70, .82) 0%, rgba(6, 10, 20, .88) 100%);
+  backdrop-filter: var(--vidro-desfoque);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
   box-shadow:
     0 40px 70px -26px rgba(0, 0, 0, .9),
-    inset 0 1px 0 rgba(255, 240, 202, .16),
-    inset 0 -24px 46px rgba(0, 0, 0, .6);
+    inset 0 1px 0 rgba(255, 245, 214, .2),
+    inset 0 -24px 46px rgba(0, 0, 0, .55),
+    0 0 40px rgba(226, 192, 117, .16);
 }
 
 /* Fio de ouro interno + veios da pedra. */
@@ -839,7 +969,7 @@ a { color: var(--cor-ouro-300); }
   content: '';
   position: absolute;
   inset: 7px;
-  border: 1px solid rgba(212, 175, 55, .18);
+  border: 1px solid var(--vidro-borda-interna);
   pointer-events: none;
 }
 .altar__tabua::after {
@@ -877,9 +1007,9 @@ a { color: var(--cor-ouro-300); }
   line-height: 1.5;
   letter-spacing: .015em;
   text-align: center;
-  color: #FFF0CA;
+  color: var(--cor-ouro-brilhante);
   text-shadow:
-    0 0 12px rgba(212, 175, 55, .6),
+    var(--luz-texto-forte),
     0 1px 0 rgba(0, 0, 0, .85);
   max-width: 34ch;
 }
@@ -908,8 +1038,8 @@ a { color: var(--cor-ouro-300); }
 .altar__placa:focus-within {
   box-shadow:
     inset 0 8px 16px rgba(0, 0, 0, .9),
-    inset 0 -1px 0 rgba(255, 240, 202, .1),
-    0 0 26px rgba(240, 200, 105, .34);
+    inset 0 -1px 0 rgba(255, 245, 214, .14),
+    0 0 38px rgba(226, 192, 117, .5);
 }
 
 /* Rebites de latão nas pontas da placa. */
@@ -918,8 +1048,8 @@ a { color: var(--cor-ouro-300); }
   height: 6px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, #F0C869, #8A6D3B);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .8);
+  background: radial-gradient(circle at 32% 30%, var(--cor-ouro-brilhante), var(--cor-ouro-sombra));
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .8), 0 0 8px rgba(226, 192, 117, .5);
 }
 
 .altar__entrada {
@@ -934,8 +1064,9 @@ a { color: var(--cor-ouro-300); }
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: .15em;
-  color: #FFF0CA;
-  caret-color: var(--cor-ouro-300);
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto);
+  caret-color: var(--cor-ouro-brilhante);
 }
 .altar__entrada::placeholder {
   color: rgba(245, 239, 224, .28);
@@ -953,9 +1084,13 @@ a { color: var(--cor-ouro-300); }
   place-items: center;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid rgba(255, 240, 202, .45);
-  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 44%, #8A6D3B 100%);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 245, 220, .55);
+  border: 1px solid rgba(255, 245, 214, .55);
+  background: radial-gradient(circle at 34% 28%,
+    var(--cor-ouro-brilhante) 0%, var(--cor-ouro-principal) 44%, var(--cor-ouro-sombra) 100%);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, .7),
+    inset 0 1px 0 rgba(255, 245, 214, .6),
+    0 0 18px rgba(226, 192, 117, .4);
   cursor: pointer;
   transition: box-shadow var(--dur-rapido) var(--mov-suave), transform var(--dur-rapido) var(--mov-suave);
 }
@@ -967,7 +1102,10 @@ a { color: var(--cor-ouro-300); }
 .altar__selo:hover,
 .altar__selo:focus-visible {
   transform: scale(1.08);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 245, 220, .55), 0 0 20px rgba(240, 200, 105, .75);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, .7),
+    inset 0 1px 0 rgba(255, 245, 214, .6),
+    0 0 34px rgba(226, 192, 117, .9);
   outline: none;
 }
 .altar__selo:disabled {
@@ -1016,7 +1154,7 @@ a { color: var(--cor-ouro-300); }
   width: 74%;
   height: 58px;
   clip-path: polygon(9% 0%, 91% 0%, 100% 100%, 0% 100%);
-  background: linear-gradient(180deg, #161D2E 0%, #0B1120 55%, #05080F 100%);
+  background: linear-gradient(180deg, var(--cor-noite-600) 0%, var(--cor-noite-800) 55%, #05080F 100%);
   box-shadow: 0 34px 46px -22px rgba(0, 0, 0, .85);
 }
 
@@ -1025,8 +1163,9 @@ a { color: var(--cor-ouro-300); }
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 7px;
-  background: linear-gradient(180deg, rgba(255, 240, 202, .22), rgba(255, 240, 202, .02));
-  border-top: 1px solid rgba(212, 175, 55, .4);
+  background: linear-gradient(180deg, rgba(255, 245, 214, .3), rgba(255, 245, 214, .02));
+  border-top: 1px solid var(--vidro-borda);
+  box-shadow: 0 0 16px rgba(226, 192, 117, .3);
 }
 
 /* ---- fissuras douradas (acerto) ---- */
@@ -1044,11 +1183,11 @@ a { color: var(--cor-ouro-300); }
 
 .altar__fissuras path {
   fill: none;
-  stroke: #FFF0CA;
+  stroke: var(--cor-ouro-brilhante);
   stroke-width: 1.4;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 7px #D4AF37);
+  filter: var(--bloom-ouro-forte);
   stroke-dasharray: 300;
   stroke-dashoffset: 300;
 }
@@ -1076,8 +1215,8 @@ a { color: var(--cor-ouro-300); }
 
 @keyframes pedraAcende {
   0%   { filter: brightness(1); }
-  45%  { filter: brightness(1.45) drop-shadow(0 0 28px rgba(240, 200, 105, .55)); }
-  100% { filter: brightness(1.15) drop-shadow(0 0 16px rgba(240, 200, 105, .32)); }
+  45%  { filter: brightness(1.5) drop-shadow(0 0 38px rgba(255, 245, 214, .7)); }
+  100% { filter: brightness(1.18) drop-shadow(0 0 22px rgba(226, 192, 117, .45)); }
 }
 
 @media (max-width: 640px) {
@@ -1099,11 +1238,25 @@ a { color: var(--cor-ouro-300); }
 }
 
 .runas-tablete {
-  background: linear-gradient(160deg, #4a4a4e 0%, #2a2a2d 100%);
-  border: 1px solid rgba(201, 162, 39, .3);
-  box-shadow: 0 20px 40px -14px rgba(0, 0, 0, .65), inset 0 0 30px rgba(0, 0, 0, .5);
+  position: relative;
+  background: linear-gradient(160deg, rgba(48, 58, 78, .82) 0%, rgba(20, 26, 40, .88) 100%);
+  backdrop-filter: var(--vidro-desfoque);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  box-shadow:
+    0 20px 40px -14px rgba(0, 0, 0, .65),
+    inset 0 0 30px rgba(0, 0, 0, .45),
+    0 0 32px rgba(226, 192, 117, .14);
   padding: var(--esp-4) var(--esp-5);
   max-width: min(var(--coluna-texto), 90%);
+}
+
+.runas-tablete::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--vidro-borda-interna);
+  pointer-events: none;
 }
 
 .runas-tablete__texto {
@@ -1111,9 +1264,9 @@ a { color: var(--cor-ouro-300); }
   font-size: clamp(1.3rem, 3vw, 1.9rem);
   letter-spacing: .08em;
   line-height: 1.9;
-  color: var(--cor-pergaminho-60);
+  color: var(--cor-pergaminho);
   text-align: center;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, .6), 0 0 12px rgba(234, 242, 255, .12);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .6), 0 0 16px rgba(169, 199, 255, .45);
 }
 
 .runas-legenda {
@@ -1136,7 +1289,8 @@ a { color: var(--cor-ouro-300); }
 .runas-legenda__rune {
   font-family: var(--fonte-runica);
   font-size: 1rem;
-  color: var(--cor-ouro-300);
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto);
 }
 
 .runas-legenda__seta {
@@ -1154,9 +1308,13 @@ a { color: var(--cor-ouro-300); }
 }
 
 .melodia-pergaminho {
-  background: linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
-  border: 1px solid var(--cor-perg-sombra);
-  box-shadow: 0 20px 45px -16px rgba(0, 0, 0, .6);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255, 245, 214, .9) 0%, transparent 70%),
+    linear-gradient(160deg, var(--cor-perg-creme-alta) 0%, var(--cor-perg-creme) 100%);
+  border: 1px solid var(--cor-ouro-sombra);
+  box-shadow:
+    0 20px 45px -16px rgba(0, 0, 0, .6),
+    0 0 60px rgba(226, 192, 117, .3);
   padding: var(--esp-5);
   max-width: min(var(--coluna-texto), 90%);
   text-align: center;
@@ -1196,7 +1354,10 @@ a { color: var(--cor-ouro-300); }
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .75));
+  /* Sombra de peso + bloom dourado: o instrumento é sólido, mas emite luz. */
+  filter:
+    drop-shadow(0 30px 60px rgba(0, 0, 0, .75))
+    drop-shadow(0 0 26px rgba(226, 192, 117, .28));
 }
 
 /* ---- anéis ---- */
@@ -1218,12 +1379,13 @@ a { color: var(--cor-ouro-300); }
 }
 
 .astro-anel__fio {
-  opacity: .9;
+  opacity: 1;
+  filter: drop-shadow(0 0 5px rgba(226, 192, 117, .5));
 }
 
 .astro-anel__ranhura {
-  stroke: var(--cor-ouro-600);
-  stroke-opacity: .55;
+  stroke: var(--cor-ouro-principal);
+  stroke-opacity: .65;
   stroke-width: 1.1;
 }
 
@@ -1254,13 +1416,14 @@ a { color: var(--cor-ouro-300); }
 }
 
 .astro-anel.is-pulso .astro-anel__fio {
-  stroke: var(--cor-ouro-300);
-  filter: drop-shadow(0 0 6px rgba(240, 200, 105, .8));
+  stroke: var(--cor-ouro-brilhante);
+  filter: var(--bloom-ouro-forte);
 }
 
+.astro-anel:hover .astro-anel__fio,
 .astro-anel:focus-visible .astro-anel__fio {
-  stroke: var(--cor-ouro-300);
-  filter: drop-shadow(0 0 8px rgba(240, 200, 105, .9));
+  stroke: var(--cor-ouro-brilhante);
+  filter: var(--bloom-ouro-forte);
 }
 
 /* ---- núcleo ---- */
@@ -1284,8 +1447,9 @@ a { color: var(--cor-ouro-300); }
 
 .astro-nucleo__halo {
   fill: none;
-  stroke: var(--cor-ouro-300);
+  stroke: var(--cor-ouro-brilhante);
   stroke-width: 1.5;
+  filter: var(--bloom-ouro);
   opacity: 0;
 }
 
@@ -1293,7 +1457,7 @@ a { color: var(--cor-ouro-300); }
 
 .astro-marcador {
   pointer-events: none;
-  filter: url(#astro-brilho) drop-shadow(0 0 10px rgba(240, 200, 105, .85));
+  filter: url(#astro-brilho) var(--bloom-ouro-forte);
 }
 
 .astro-marcador__estrela {
@@ -1368,7 +1532,8 @@ a { color: var(--cor-ouro-300); }
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: .1;
+  opacity: .16;
+  filter: drop-shadow(0 0 8px rgba(226, 192, 117, .4));
   animation: zodiacoGira 240s linear infinite;
   transform-origin: 50% 50%;
 }
@@ -1396,19 +1561,21 @@ a { color: var(--cor-ouro-300); }
 }
 
 .mapa-linha {
-  stroke: var(--cor-estelar);
-  stroke-opacity: .16;
+  stroke: var(--cor-estrela-azul);
+  stroke-opacity: .22;
   stroke-width: 1;
   stroke-dasharray: 2 7;
   stroke-linecap: round;
 }
 
 .mapa-linha--acesa {
-  stroke: #D4AF37;
-  stroke-opacity: .95;
+  stroke: var(--cor-ouro-brilhante);
+  stroke-opacity: 1;
   stroke-width: 1.5;
   stroke-dasharray: none;
-  filter: drop-shadow(0 0 6px #D4AF37);
+  filter:
+    drop-shadow(0 0 5px rgba(255, 245, 214, .9))
+    drop-shadow(0 0 14px var(--cor-ouro-principal));
 }
 
 /* A linha da estrela recém-conquistada se desenha na tela. */
@@ -1465,15 +1632,17 @@ a { color: var(--cor-ouro-300); }
 
 .mapa-estrela--atual .estrela__corpo {
   fill: var(--cor-ouro-300);
-  filter: drop-shadow(0 0 10px rgba(240, 200, 105, .9));
+  filter: var(--bloom-ouro-forte);
 }
-.mapa-estrela--atual .estrela__faisca { fill: #FFF6DF; }
-.mapa-estrela--atual .estrela__nucleo { fill: #FFFDF6; }
+.mapa-estrela--atual .estrela__faisca { fill: var(--cor-ouro-brilhante); }
+.mapa-estrela--atual .estrela__nucleo { fill: var(--cor-estrela-branca); }
 
 .mapa-estrela--atual .estrela__aura {
   width: 58px;
   height: 58px;
-  background: radial-gradient(circle, rgba(240, 200, 105, .38) 0%, rgba(240, 200, 105, 0) 68%);
+  background:
+    radial-gradient(circle, rgba(255, 245, 214, .34) 0%, rgba(255, 245, 214, 0) 46%),
+    radial-gradient(circle, rgba(226, 192, 117, .34) 46%, rgba(226, 192, 117, 0) 72%);
   animation: estrelaAura 3400ms ease-in-out infinite;
 }
 
@@ -1494,16 +1663,16 @@ a { color: var(--cor-ouro-300); }
   height: 38px;
 }
 .mapa-estrela--completo .estrela__corpo {
-  fill: var(--cor-ouro-500);
-  filter: drop-shadow(0 0 7px rgba(212, 175, 55, .85));
+  fill: var(--cor-ouro-principal);
+  filter: var(--bloom-ouro);
 }
 .mapa-estrela--completo .estrela__faisca { fill: var(--cor-ouro-300); }
-.mapa-estrela--completo .estrela__nucleo { fill: #FFF6DF; }
+.mapa-estrela--completo .estrela__nucleo { fill: var(--cor-ouro-brilhante); }
 
 .mapa-estrela--completo .estrela__aura {
   width: 38px;
   height: 38px;
-  background: radial-gradient(circle, rgba(212, 175, 55, .22) 0%, rgba(212, 175, 55, 0) 70%);
+  background: radial-gradient(circle, rgba(226, 192, 117, .3) 0%, rgba(226, 192, 117, 0) 72%);
   transform: translate(-50%, -50%) scale(1.9);
 }
 
@@ -1515,10 +1684,11 @@ a { color: var(--cor-ouro-300); }
 .mapa-estrela--bloqueado .estrela__glifo {
   width: 22px;
   height: 22px;
-  opacity: .4;
+  opacity: .5;
 }
 .mapa-estrela--bloqueado .estrela__ponto {
-  fill: #C8D2E4;
+  fill: var(--cor-estrela-azul);
+  filter: drop-shadow(0 0 6px rgba(169, 199, 255, .6));
 }
 
 /* ---- card flutuante (Art Nouveau + glassmorphism) ---- */
@@ -1539,11 +1709,11 @@ a { color: var(--cor-ouro-300); }
   width: max-content;
   max-width: min(280px, 60vw);
   padding: var(--esp-3) var(--esp-4);
-  background: rgba(10, 15, 29, .85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 175, 55, .55);
-  box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .8), 0 0 22px rgba(240, 200, 105, .1);
+  background: var(--vidro-safira);
+  backdrop-filter: var(--vidro-desfoque) saturate(1.2);
+  -webkit-backdrop-filter: var(--vidro-desfoque) saturate(1.2);
+  border: 1px solid var(--vidro-borda);
+  box-shadow: var(--vidro-sombra);
   text-align: center;
   pointer-events: none;
   opacity: 0;
@@ -1556,7 +1726,7 @@ a { color: var(--cor-ouro-300); }
   content: '';
   position: absolute;
   inset: 4px;
-  border: 1px solid rgba(212, 175, 55, .28);
+  border: 1px solid var(--vidro-borda-interna);
   pointer-events: none;
 }
 
@@ -1577,7 +1747,8 @@ a { color: var(--cor-ouro-300); }
   position: absolute;
   width: 9px;
   height: 9px;
-  border: 0 solid var(--cor-ouro-500);
+  border: 0 solid var(--cor-ouro-brilhante);
+  filter: var(--bloom-ouro);
   pointer-events: none;
 }
 .mapa-card__canto--tl { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
@@ -1591,7 +1762,8 @@ a { color: var(--cor-ouro-300); }
   font-size: 1.15rem;
   line-height: 1.25;
   letter-spacing: .01em;
-  color: var(--cor-ouro-300);
+  color: var(--cor-ouro-brilhante);
+  text-shadow: var(--luz-texto);
 }
 
 .mapa-card__subtitulo {
@@ -1643,10 +1815,11 @@ a { color: var(--cor-ouro-300); }
 }
 .constelacao__no--completo {
   fill: var(--cor-ouro-300);
-  filter: drop-shadow(0 0 10px rgba(240, 200, 105, .9));
+  filter: var(--bloom-ouro);
 }
 .constelacao__no--atual {
-  fill: var(--cor-ouro-300);
+  fill: var(--cor-ouro-brilhante);
+  filter: var(--bloom-ouro-forte);
   cursor: pointer;
 }
 .constelacao__no--bloqueado {
@@ -1655,23 +1828,24 @@ a { color: var(--cor-ouro-300); }
 
 .constelacao__anel {
   fill: none;
-  stroke: var(--cor-ouro-300);
-  stroke-opacity: .5;
+  stroke: var(--cor-ouro-brilhante);
+  stroke-opacity: .6;
   stroke-width: 1;
   animation: anelPulso 2600ms ease-out infinite;
   pointer-events: none;
 }
 
 .constelacao__linha {
-  stroke: var(--cor-pergaminho);
-  stroke-opacity: .12;
+  stroke: var(--cor-estrela-azul);
+  stroke-opacity: .16;
   stroke-width: 1;
   stroke-dasharray: 3 5;
 }
 .constelacao__linha--acesa {
-  stroke: var(--cor-ouro-600);
-  stroke-opacity: .75;
+  stroke: var(--cor-ouro-principal);
+  stroke-opacity: .9;
   stroke-dasharray: none;
+  filter: drop-shadow(0 0 6px rgba(226, 192, 117, .7));
 }
 
 .constelacao__label {
@@ -1768,8 +1942,10 @@ a { color: var(--cor-ouro-300); }
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed rgba(201, 162, 39, .35);
-  background: rgba(201, 162, 39, .04);
+  border: 1px dashed rgba(226, 192, 117, .38);
+  background: var(--vidro-safira);
+  backdrop-filter: var(--vidro-desfoque);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
 }
 
 /* ============================================================

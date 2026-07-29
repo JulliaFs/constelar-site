@@ -1,7 +1,159 @@
 /* ============================================================
+   CENA DE CÉU PROFUNDO — a iluminação global do site.
+   Quatro camadas, de trás para a frente:
+     1. <html>  — gradiente base: safira no centro → penumbra nas bordas
+     2. body::before — nuvens de nebulosa (violeta + ciano), desfocadas
+     3. #tsparticles-layer::before/::after — campo de estrelas em 3 tamanhos
+     4. body::after — névoa dourada central (o "bloom" da cena)
+   Nenhuma delas recebe ponteiro; todas ficam abaixo de #app (z-index 1).
+   ============================================================ */
+
+html {
+  background-color: var(--cor-noite-900);
+  background-image:
+    radial-gradient(ellipse 96% 74% at 50% 54%,
+      var(--cor-noite-600) 0%,
+      #12203A 26%,
+      var(--cor-noite-800) 58%,
+      #06090F 82%,
+      var(--cor-noite-900) 100%);
+  background-attachment: fixed;
+}
+
+/* O <body> não pinta nada: seria uma tampa opaca sobre as nebulosas. */
+body {
+  background: none;
+}
+
+/* ---- camada 1 de nebulosa: violeta profundo + ciano místico ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 40% 34% at 22% 26%, var(--cor-nebula-violeta) 0%, transparent 72%),
+    radial-gradient(ellipse 34% 30% at 76% 68%, var(--cor-nebula-ciano) 0%, transparent 74%),
+    radial-gradient(ellipse 30% 26% at 68% 16%, rgba(76, 29, 149, .22) 0%, transparent 76%),
+    radial-gradient(ellipse 36% 24% at 28% 84%, rgba(13, 148, 136, .13) 0%, transparent 78%);
+  filter: blur(80px);
+  will-change: transform;
+  animation: nebulaGira 96s linear infinite;
+}
+
+/* Escala > 1 para que a rotação nunca revele os cantos vazios. */
+@keyframes nebulaGira {
+  0%   { transform: scale(1.5) rotate(0deg);   opacity: .88; }
+  50%  { transform: scale(1.74) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1.5) rotate(360deg); opacity: .88; }
+}
+
+/* ---- camada 2 de nebulosa: névoa de ouro âmbar no centro ---- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 46% 40% at 50% 46%,
+      var(--cor-nebula-ouro) 0%,
+      rgba(212, 175, 55, .05) 44%,
+      transparent 74%);
+  filter: blur(60px);
+  will-change: transform;
+  animation: nebulaOuroRespira 26s ease-in-out infinite;
+}
+
+@keyframes nebulaOuroRespira {
+  0%, 100% { transform: scale(1);    opacity: .78; }
+  50%      { transform: scale(1.14); opacity: 1; }
+}
+
+/* ============================================================
+   ESTRELAS VIVAS — três tamanhos, três temperaturas de cor.
+   Cada estrela é um par de gradientes (núcleo + halo), o que dá a
+   iluminação individual; as duas camadas piscam em ritmos diferentes
+   para o campo nunca pulsar em bloco.
+   ============================================================ */
+
+#tsparticles-layer::before,
+#tsparticles-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Tamanhos 1 e 2: poeira miúda branca + estrelas médias creme. */
+#tsparticles-layer::before {
+  background-image:
+    /* -- tamanho 1: branco puro, 1px -- */
+    radial-gradient(1px 1px at 18% 12%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(4px 4px at 18% 12%, rgba(255, 255, 255, .16) 0, transparent 100%),
+    radial-gradient(1px 1px at 62% 34%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(4px 4px at 62% 34%, rgba(255, 255, 255, .14) 0, transparent 100%),
+    radial-gradient(1px 1px at 84% 76%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(4px 4px at 84% 76%, rgba(255, 255, 255, .14) 0, transparent 100%),
+    radial-gradient(1px 1px at 34% 88%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(1px 1px at 92% 22%, var(--cor-estrela-branca) 0, transparent 100%),
+    /* -- tamanho 2: creme, 1.8px, halo mais aberto -- */
+    radial-gradient(1.8px 1.8px at 44% 20%, var(--cor-estrela-creme) 0, transparent 100%),
+    radial-gradient(8px 8px at 44% 20%, rgba(255, 241, 206, .18) 0, transparent 100%),
+    radial-gradient(1.8px 1.8px at 12% 62%, var(--cor-estrela-creme) 0, transparent 100%),
+    radial-gradient(8px 8px at 12% 62%, rgba(255, 241, 206, .16) 0, transparent 100%),
+    radial-gradient(1.8px 1.8px at 74% 52%, var(--cor-estrela-creme) 0, transparent 100%),
+    radial-gradient(8px 8px at 74% 52%, rgba(255, 241, 206, .16) 0, transparent 100%);
+  background-size:
+    260px 260px, 260px 260px, 260px 260px, 260px 260px,
+    260px 260px, 260px 260px, 260px 260px, 260px 260px,
+    430px 430px, 430px 430px, 430px 430px, 430px 430px,
+    430px 430px, 430px 430px;
+  opacity: .85;
+  animation: estrelaPisca 5.4s ease-in-out infinite;
+}
+
+/* Tamanho 3: as poucas estrelas grandes, em azul estelar. */
+#tsparticles-layer::after {
+  background-image:
+    radial-gradient(2.6px 2.6px at 28% 30%, var(--cor-estrela-azul) 0, transparent 100%),
+    radial-gradient(14px 14px at 28% 30%, rgba(169, 199, 255, .16) 0, transparent 100%),
+    radial-gradient(2.6px 2.6px at 82% 18%, var(--cor-estrela-branca) 0, transparent 100%),
+    radial-gradient(14px 14px at 82% 18%, rgba(255, 255, 255, .14) 0, transparent 100%),
+    radial-gradient(2.6px 2.6px at 58% 78%, var(--cor-estrela-azul) 0, transparent 100%),
+    radial-gradient(14px 14px at 58% 78%, rgba(169, 199, 255, .15) 0, transparent 100%);
+  background-size:
+    620px 620px, 620px 620px, 620px 620px,
+    620px 620px, 620px 620px, 620px 620px;
+  background-position: 90px 40px;
+  opacity: .8;
+  animation: estrelaPisca 8.6s ease-in-out infinite reverse;
+}
+
+@keyframes estrelaPisca {
+  0%, 100% { opacity: .42; }
+  38%      { opacity: .95; }
+  70%      { opacity: .6; }
+}
+
+/* Movimento é decoração: quem pede menos movimento fica com a cena parada,
+   mas com a mesma iluminação. */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after,
+  #tsparticles-layer::before,
+  #tsparticles-layer::after {
+    animation: none;
+  }
+  body::before { transform: scale(1.5); }
+}
+
+/* ============================================================
    TELA INICIAL — astrolábio celestial (Dark Academia / Art Nouveau).
-   Fundo estrelado escuro; o astrolábio em si vive em components.css
-   (prefixo .astro-*).
+   O céu global aparece através dela; a tela só acrescenta um véu de
+   vinheta para o astrolábio não competir com as bordas.
+   O astrolábio em si vive em components.css (prefixo .astro-*).
    ============================================================ */
 
 .tela-capa {
@@ -14,8 +166,13 @@
   width: 100%;
   min-height: 100%;
   padding: var(--esp-4) 0;
+  /* Vinheta transparente: escurece só as bordas e deixa o safira do céu
+     (e as nebulosas) atravessarem o centro da cena. */
   background:
-    radial-gradient(closest-side at 50% 42%, #0D1322 0%, #080C16 62%, #050811 100%);
+    radial-gradient(ellipse 78% 70% at 50% 44%,
+      transparent 0%,
+      rgba(4, 7, 17, .35) 62%,
+      rgba(4, 7, 17, .78) 100%);
   transition: opacity var(--dur-padrao) var(--mov-suave), transform var(--dur-padrao) var(--mov-suave);
 }
 
@@ -30,9 +187,9 @@
   font-size: clamp(1.5rem, 3.4vw, 2.3rem);
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--cor-ouro-300);
+  color: var(--cor-ouro-brilhante);
   text-align: center;
-  text-shadow: 0 0 26px rgba(240, 200, 105, .28);
+  text-shadow: var(--luz-texto-forte);
 }
 
 .tela-capa__dica {
@@ -42,10 +199,10 @@
   font-size: clamp(1rem, 2.2vw, 1.35rem);
   line-height: 1.6;
   color: var(--cor-ouro-300);
-  opacity: .8;
+  opacity: .88;
   text-align: center;
   max-width: 34ch;
-  text-shadow: 0 0 18px rgba(240, 200, 105, .2);
+  text-shadow: var(--luz-texto);
 }
 
 /* ---- ÓRFÃO: desenrolar de pergaminho da capa anterior. Fora de uso
@@ -174,9 +331,9 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 46% 34% at 50% 82%, rgba(240, 200, 105, .2) 0%, rgba(212, 175, 55, .07) 42%, transparent 68%),
-    radial-gradient(ellipse 70% 60% at 50% 46%, rgba(18, 25, 41, .5) 0%, transparent 70%),
-    radial-gradient(ellipse 96% 88% at 50% 50%, transparent 30%, rgba(3, 5, 12, .82) 88%);
+    radial-gradient(ellipse 48% 36% at 50% 82%, rgba(255, 245, 214, .26) 0%, rgba(226, 192, 117, .1) 42%, transparent 70%),
+    radial-gradient(ellipse 62% 52% at 50% 44%, rgba(22, 40, 70, .55) 0%, transparent 72%),
+    radial-gradient(ellipse 96% 88% at 50% 50%, transparent 34%, rgba(4, 7, 17, .8) 90%);
 }
 
 .tela-altar__palco {
@@ -215,7 +372,8 @@
   width: 200px;
   height: 140px;
   object-fit: cover;
-  border: 1px solid rgba(201, 162, 39, .25);
+  border: 1px solid var(--vidro-borda-interna);
+  box-shadow: 0 16px 34px -14px rgba(0, 0, 0, .8), 0 0 18px rgba(226, 192, 117, .12);
 }
 
 .tela-narrativa__legenda {
@@ -244,7 +402,8 @@
   font-size: clamp(1rem, 2.2vw, 1.3rem);
   letter-spacing: .06em;
   color: var(--cor-ouro-300);
-  opacity: .82;
+  opacity: .9;
+  text-shadow: var(--luz-texto);
 }
 
 .puzzle-estagio {
@@ -271,16 +430,18 @@
 
 /* Conexão correta: fio de luz neon com halo dourado. */
 .puzzle-linha--acesa {
-  stroke: #FFF0CA;
+  stroke: var(--cor-ouro-brilhante);
   stroke-width: 1.8;
-  filter: drop-shadow(0 0 8px #D4AF37);
+  filter:
+    drop-shadow(0 0 6px rgba(255, 245, 214, .9))
+    drop-shadow(0 0 16px var(--cor-ouro-principal));
   animation: puzzleLinhaAcende 520ms var(--mov-entrada) both;
 }
 
 @keyframes puzzleLinhaAcende {
-  0%   { opacity: 0; filter: drop-shadow(0 0 16px #D4AF37) brightness(2.2); }
-  60%  { opacity: 1; filter: drop-shadow(0 0 14px #D4AF37) brightness(1.6); }
-  100% { opacity: 1; filter: drop-shadow(0 0 8px #D4AF37) brightness(1); }
+  0%   { opacity: 0; filter: drop-shadow(0 0 22px var(--cor-ouro-principal)) brightness(2.4); }
+  60%  { opacity: 1; filter: drop-shadow(0 0 18px var(--cor-ouro-principal)) brightness(1.7); }
+  100% { opacity: 1; filter: drop-shadow(0 0 6px rgba(255, 245, 214, .9)) drop-shadow(0 0 16px var(--cor-ouro-principal)) brightness(1); }
 }
 
 /* Conexão incorreta: apenas se desfaz. */
@@ -334,12 +495,13 @@
 }
 
 .puzzle-no__corpo {
-  fill: #D4AF37;
-  opacity: .62;
+  fill: var(--cor-ouro-principal);
+  opacity: .72;
+  filter: drop-shadow(0 0 6px rgba(226, 192, 117, .45));
   transition: opacity var(--dur-rapido) var(--mov-suave), filter var(--dur-rapido) var(--mov-suave);
 }
-.puzzle-no__faisca { fill: #F0C869; opacity: .5; }
-.puzzle-no__nucleo { fill: #FFF0CA; }
+.puzzle-no__faisca { fill: var(--cor-ouro-300); opacity: .6; }
+.puzzle-no__nucleo { fill: var(--cor-ouro-brilhante); }
 
 .puzzle-no__aura {
   position: absolute;
@@ -347,14 +509,14 @@
   width: 100%; height: 100%;
   transform: translate(-50%, -50%) scale(1.9);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(212, 175, 55, .18) 0%, transparent 68%);
+  background: radial-gradient(circle, rgba(226, 192, 117, .28) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .puzzle-no:hover .puzzle-no__corpo,
 .puzzle-no:focus-visible .puzzle-no__corpo {
   opacity: 1;
-  filter: drop-shadow(0 0 8px rgba(240, 200, 105, .8));
+  filter: var(--bloom-ouro-forte);
 }
 .puzzle-no:focus-visible { outline: none; }
 
@@ -362,14 +524,14 @@
   transform: scale(1.28);
 }
 .puzzle-no.is-selecionado .puzzle-no__corpo {
-  fill: #FFF0CA;
+  fill: var(--cor-ouro-brilhante);
   opacity: 1;
-  filter: drop-shadow(0 0 12px #D4AF37);
+  filter: var(--bloom-ouro-forte);
 }
 
 .puzzle-no.is-aceso .puzzle-no__corpo {
   opacity: 1;
-  filter: drop-shadow(0 0 9px rgba(240, 200, 105, .85));
+  filter: var(--bloom-ouro);
 }
 .puzzle-no.is-aceso .puzzle-no__faisca { opacity: .95; }
 
@@ -380,14 +542,14 @@
   z-index: 3;
 }
 .puzzle-no--alpha .puzzle-no__corpo {
-  fill: #F0C869;
-  opacity: .9;
-  filter: drop-shadow(0 0 10px rgba(255, 240, 202, .8));
+  fill: var(--cor-ouro-300);
+  opacity: 1;
+  filter: var(--bloom-ouro-forte);
 }
 .puzzle-no--alpha .puzzle-no__aura {
   background:
-    radial-gradient(circle, rgba(255, 240, 202, .3) 0%, rgba(255, 240, 202, 0) 42%),
-    radial-gradient(circle, rgba(212, 175, 55, .22) 44%, rgba(212, 175, 55, 0) 72%);
+    radial-gradient(circle, rgba(255, 245, 214, .4) 0%, rgba(255, 245, 214, 0) 44%),
+    radial-gradient(circle, rgba(226, 192, 117, .3) 44%, rgba(226, 192, 117, 0) 74%);
   animation: puzzleAlphaPulsa 3600ms ease-in-out infinite;
 }
 
@@ -428,9 +590,9 @@
 
 @keyframes puzzleCompletoGlow {
   0%   { filter: brightness(1); }
-  30%  { filter: brightness(1.9) drop-shadow(0 0 36px rgba(240, 200, 105, .75)); }
-  55%  { filter: brightness(1.2); }
-  75%  { filter: brightness(1.7) drop-shadow(0 0 28px rgba(240, 200, 105, .6)); }
+  30%  { filter: brightness(2) drop-shadow(0 0 44px rgba(255, 245, 214, .8)); }
+  55%  { filter: brightness(1.25); }
+  75%  { filter: brightness(1.75) drop-shadow(0 0 34px rgba(226, 192, 117, .7)); }
   100% { filter: brightness(1); }
 }
 
@@ -447,10 +609,10 @@
 
 .puzzle-harpa__traco > * {
   fill: none;
-  stroke: var(--cor-ouro-300);
+  stroke: var(--cor-ouro-brilhante);
   stroke-width: 1.1;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 6px rgba(240, 200, 105, .7));
+  filter: var(--bloom-ouro);
 }
 .puzzle-harpa__corda {
   stroke-width: .7;
@@ -479,8 +641,10 @@
   top: 50%;
   left: 50%;
   border-radius: 50%;
-  border: 1px solid rgba(201, 162, 39, .4);
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, .4);
+  border: 1px solid var(--vidro-borda);
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, .4),
+    0 0 14px rgba(226, 192, 117, .18);
   cursor: grab;
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
   touch-action: none;
@@ -496,7 +660,11 @@
 }
 
 .astrolabio__anel.is-pulso {
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, .4), 0 0 18px rgba(240, 200, 105, .5);
+  border-color: var(--cor-ouro-brilhante);
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, .4),
+    0 0 26px rgba(226, 192, 117, .7),
+    inset 0 0 18px rgba(226, 192, 117, .2);
 }
 
 .astrolabio__anel--externo { width: 100%; height: 100%; }
@@ -523,8 +691,9 @@
   height: 15%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #F0C869 0%, #D4AF37 38%, #A8801F 72%, #7A5C15 100%);
-  box-shadow: var(--sombra-selo);
+  background: radial-gradient(circle at 34% 28%,
+    var(--cor-ouro-brilhante) 0%, var(--cor-ouro-principal) 40%, #A88B4C 74%, var(--cor-ouro-sombra) 100%);
+  box-shadow: var(--sombra-selo), var(--brilho-m);
   pointer-events: none;
   z-index: 5;
 }
@@ -535,7 +704,7 @@
 
 @keyframes astrolabioAcende {
   0%   { filter: brightness(1); }
-  50%  { filter: brightness(1.8) drop-shadow(0 0 40px rgba(240, 200, 105, .7)); transform: scale(1.03); }
+  50%  { filter: brightness(1.9) drop-shadow(0 0 52px rgba(255, 245, 214, .8)); transform: scale(1.03); }
   100% { filter: brightness(1); transform: scale(1); }
 }
 
@@ -583,7 +752,8 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border: 1px solid rgba(201, 162, 39, .25);
+  border: 1px solid var(--vidro-borda-interna);
+  box-shadow: 0 16px 34px -14px rgba(0, 0, 0, .8), 0 0 18px rgba(226, 192, 117, .12);
 }
 
 .tela-galeria__legenda {

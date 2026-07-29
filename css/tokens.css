@@ -46,18 +46,37 @@
 }
 
 :root {
-  /* --- color: night sky --- */
-  --cor-noite-900: #070B1A;
-  --cor-noite-800: #0B1026;
-  --cor-noite-700: #0E1330;
-  --cor-noite-600: #161C42;
+  /* --- color: deep sky (safira / cobalto) ---
+     A luz nasce no centro (600) e morre na penumbra das bordas (900).
+     Toda a cena de nebulosa em screens.css é construída sobre esta escala. */
+  --cor-noite-900: #040711;
+  --cor-noite-800: #0A1120;
+  --cor-noite-700: #101B33;
+  --cor-noite-600: #162846;
   --cor-veludo: #1B2A6B;
 
-  /* --- color: gold --- */
-  --cor-ouro-700: #8A6B1F;
-  --cor-ouro-600: #C9A227;
-  --cor-ouro-500: #D4AF37;
-  --cor-ouro-300: #F0C869;
+  /* --- color: gold, iluminado ---
+     Três degraus de referência; a escala numérica abaixo existe só para
+     o código legado e aponta para estes mesmos valores. */
+  --cor-ouro-brilhante: #FFF5D6;
+  --cor-ouro-principal: #E2C075;
+  --cor-ouro-sombra: #8A6D3B;
+
+  --cor-ouro-700: var(--cor-ouro-sombra);
+  --cor-ouro-600: #C6A45E;
+  --cor-ouro-500: var(--cor-ouro-principal);
+  --cor-ouro-300: #F6DFA6;
+  --cor-ouro-100: var(--cor-ouro-brilhante);
+
+  /* --- color: nebulosa (camadas de luz do fundo) --- */
+  --cor-nebula-violeta: rgba(76, 29, 149, .35);
+  --cor-nebula-ciano: rgba(13, 148, 136, .18);
+  --cor-nebula-ouro: rgba(212, 175, 55, .12);
+
+  /* --- color: estrelas (três temperaturas) --- */
+  --cor-estrela-branca: #FFFFFF;
+  --cor-estrela-creme: #FFF1CE;
+  --cor-estrela-azul: #A9C7FF;
 
   /* --- color: ink & accents --- */
   --cor-pergaminho: #F5EFE0;
@@ -67,6 +86,17 @@
   --cor-pergaminho-22: rgba(245, 239, 224, .22);
   --cor-estelar: #EAF2FF;
   --cor-cobre: #CE8A5C;
+
+  /* --- glassmorphism: safira escura + filigrana de ouro --- */
+  --vidro-safira: rgba(15, 23, 42, .75);
+  --vidro-safira-densa: rgba(11, 18, 34, .86);
+  --vidro-desfoque: blur(12px);
+  --vidro-borda: rgba(226, 192, 117, .55);
+  --vidro-borda-interna: rgba(226, 192, 117, .26);
+  --vidro-sombra:
+    0 26px 64px -20px rgba(0, 0, 0, .85),
+    0 0 34px rgba(226, 192, 117, .14),
+    inset 0 1px 0 rgba(255, 245, 214, .16);
 
   /* --- color: warm parchment (scoped to diegetic paper objects only —
      the cover's scroll, the pedestal/tablet props, and the carta letter.
@@ -98,15 +128,28 @@
   --coluna-texto: 640px;
   --raio: 0px;
 
-  /* --- glow / shadow --- */
-  --brilho-p: 0 0 12px rgba(240, 200, 105, .22);
-  --brilho-m: 0 0 26px rgba(240, 200, 105, .32);
-  --brilho-g: 0 0 64px rgba(240, 200, 105, .26);
-  --brilho-estrela: 0 0 8px rgba(234, 242, 255, .85);
-  --sombra-abobada: 0 40px 90px -30px rgba(0, 0, 0, .85), inset 0 0 90px rgba(7, 11, 26, .9);
-  --sombra-selo: 0 18px 34px -12px rgba(0, 0, 0, .7), inset 0 2px 0 rgba(255, 235, 180, .45), inset 0 -8px 18px rgba(90, 62, 10, .55);
-  --linha-fina: 1px solid rgba(201, 162, 39, .28);
-  --linha-viva: 1px solid #C9A227;
+  /* --- glow / bloom / shadow ---
+     `--bloom-*` são filtros (para SVG, máscaras e ícones);
+     `--brilho-*` são box-shadows; `--luz-*` são text-shadows. */
+  --bloom-ouro: drop-shadow(0 0 12px rgba(226, 192, 117, .5));
+  --bloom-ouro-forte:
+    drop-shadow(0 0 14px rgba(255, 245, 214, .55))
+    drop-shadow(0 0 40px rgba(226, 192, 117, .35));
+  --bloom-estrela: drop-shadow(0 0 10px rgba(255, 255, 255, .8));
+
+  --luz-texto: 0 0 10px rgba(255, 240, 202, .6);
+  --luz-texto-forte:
+    0 0 12px rgba(255, 240, 202, .75),
+    0 0 38px rgba(226, 192, 117, .38);
+
+  --brilho-p: 0 0 14px rgba(226, 192, 117, .3);
+  --brilho-m: 0 0 30px rgba(226, 192, 117, .45);
+  --brilho-g: 0 0 72px rgba(226, 192, 117, .38);
+  --brilho-estrela: 0 0 10px rgba(255, 255, 255, .9);
+  --sombra-abobada: 0 40px 90px -30px rgba(0, 0, 0, .85), inset 0 0 90px rgba(4, 7, 17, .72);
+  --sombra-selo: 0 18px 34px -12px rgba(0, 0, 0, .7), inset 0 2px 0 rgba(255, 245, 214, .5), inset 0 -8px 18px rgba(138, 109, 59, .55);
+  --linha-fina: 1px solid rgba(226, 192, 117, .3);
+  --linha-viva: 1px solid var(--cor-ouro-principal);
 
   /* --- motion --- */
   --mov-suave: cubic-bezier(.22, .61, .36, 1);
